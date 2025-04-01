@@ -1,0 +1,5 @@
+build/
+src/main/resources/application-dev.properties
+
+/mvnw text eol=lf
+*.cmd text eol=crlf
