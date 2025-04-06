@@ -1,6 +1,8 @@
 package com.statistictgchatbot.model.submodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.statistictgchatbot.constant.TypeOfEvent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +11,14 @@ import java.util.List;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Message {
+
+    @JsonProperty(value = "id")
+    private int id;
+
+    @JsonProperty(value = "type")
+    private TypeOfEvent type;
 
     @JsonProperty(value = "date")
     private Date createAt;

@@ -38,7 +38,9 @@ public class FileServiceImpl implements FileService {
             log.info("Content from url: {}", jsonBuilder);
 
             JSONObject jsonObject = new JSONObject(jsonBuilder.toString());
-            String filePath = jsonObject.getJSONObject("result").getString("file_path");
+            String filePath = jsonObject
+                    .getJSONObject("result")
+                    .getString("file_path");
 
             URL fileUrl = new URL("https://api.telegram.org/file/bot" + botProps.token() + "/" + filePath);
             log.info("File url: {}", fileUrl);
@@ -47,6 +49,7 @@ public class FileServiceImpl implements FileService {
                 java.io.File localFile =
                         new java.io.File("src/main/resources/uploaded/" + fileName);
                 FileUtils.copyInputStreamToFile(inputStream, localFile);
+                log.info("File successfully saved");
             }
         }
     }

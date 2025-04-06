@@ -3,6 +3,7 @@ package com.statistictgchatbot.controller;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.FileService;
+import com.statistictgchatbot.service.UserEventService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -15,11 +16,13 @@ import java.io.IOException;
 public class BotController extends TelegramLongPollingBot {
 
     private final BotProps botProps;
+    private final UserEventService userEventService;
     private final FileService fileService;
 
-    public BotController(BotProps botProps, FileService fileService) {
+    public BotController(BotProps botProps, UserEventService userEventService, FileService fileService) {
         super(botProps.token());
         this.botProps = botProps;
+        this.userEventService = userEventService;
         this.fileService = fileService;
     }
 
@@ -40,10 +43,15 @@ public class BotController extends TelegramLongPollingBot {
 
             try {
                 fileService.uploadFile(fileName, fieldId);
+                userEventService.parseUserEventFromFile("src/main/resources/uploaded/" + fileName);
             } catch (IOException e) {
                 sendMessage(chatId, "Failed to download file. Try again later!");
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ignored) {}
                 throw new FileDownloadException("Failed to download file");
             }
+
         }
     }
 
