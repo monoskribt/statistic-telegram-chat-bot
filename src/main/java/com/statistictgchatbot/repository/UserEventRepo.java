@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface UserEventRepo extends MongoRepository<UserEvent, UUID> {
+public interface UserEventRepo extends MongoRepository<UserEvent, String> {
 }

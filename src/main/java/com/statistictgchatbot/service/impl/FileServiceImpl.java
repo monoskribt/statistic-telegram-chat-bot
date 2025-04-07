@@ -8,11 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
+import java.util.Optional;
 
 @Component
 public class FileServiceImpl implements FileService {
@@ -53,4 +51,13 @@ public class FileServiceImpl implements FileService {
             }
         }
     }
+
+    @Override
+    public void deleteFileFromLocal(String fileName) {
+        File file = new File("src/main/resources/uploaded/" + fileName);
+        Optional.of(file)
+                .filter(File::exists)
+                .ifPresent(File::delete);
+    }
+
 }
