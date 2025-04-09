@@ -1,11 +1,13 @@
 package com.statistictgchatbot.controller;
 
+import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.BotService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 public class BotController extends TelegramLongPollingBot {
@@ -27,14 +29,34 @@ public class BotController extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if(update.hasMessage() && update.getMessage().hasDocument()) {
-            Document document = update.getMessage().getDocument();
-
-            String fieldId = document.getFileId();
-            String fileName = document.getFileName();
+        if (update.hasMessage()) {
             Long chatId = update.getMessage().getChatId();
 
-            botService.documentProcessing(fileName, fieldId, chatId);
+            if (update.getMessage().hasText()) {
+                String messageText = update.getMessage().getText();
+
+                if (messageText.startsWith("/stats")) {
+                    String chatName = messageText.replace("/stats", "").trim();
+                    try {
+                        botService.getStats(chatId, chatName);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return;
+                }
+            }
+
+            if (update.getMessage().hasDocument()) {
+                Document document = update.getMessage().getDocument();
+                String fieldId = document.getFileId();
+                String fileName = document.getFileName();
+
+                try {
+                    botService.documentProcessing(fileName, fieldId, chatId);
+                } catch (TelegramApiException e) {
+                    throw new FileDownloadException("Failed while download file");
+                }
+            }
         }
     }
 }

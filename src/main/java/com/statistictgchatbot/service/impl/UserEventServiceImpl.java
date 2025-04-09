@@ -3,6 +3,7 @@ package com.statistictgchatbot.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.statistictgchatbot.constant.MessageToUser;
+import com.statistictgchatbot.exception.ParseFileException;
 import com.statistictgchatbot.model.UserEvent;
 import com.statistictgchatbot.repository.UserEventRepo;
 import com.statistictgchatbot.service.MessageSender;
@@ -32,9 +33,13 @@ public class UserEventServiceImpl implements UserEventService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public UserEvent parseUserEventFromFile(String filePath) throws IOException {
+    public UserEvent parseUserEventFromFile(String filePath) {
         log.info("Start parse from file path: {}", filePath);
-        return objectMapper.readValue(new File(filePath), UserEvent.class);
+        try {
+            return objectMapper.readValue(new File(filePath), UserEvent.class);
+        } catch (IOException e) {
+            throw new ParseFileException("Failed while parsing", e.getCause());
+        }
     }
 
     @Override

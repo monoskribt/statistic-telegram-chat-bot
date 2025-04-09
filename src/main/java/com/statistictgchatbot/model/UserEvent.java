@@ -7,7 +7,6 @@ import com.statistictgchatbot.model.submodel.Message;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
-import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserEvent {
