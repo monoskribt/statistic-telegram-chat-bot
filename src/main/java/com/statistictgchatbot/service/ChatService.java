@@ -1,16 +1,18 @@
 package com.statistictgchatbot.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.statistictgchatbot.model.UserEvent;
+import com.statistictgchatbot.model.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
 
-public interface UserEventService {
+public interface ChatService {
 
-    UserEvent parseUserEventFromFile(String filePath) throws IOException;
+    Chat parseChatFromFile(String filePath) throws IOException;
 
-    void saveUserEventEntity(UserEvent userEvent, Long chatId)
+    void saveChatEntity(Chat userEvent, Long chatId)
             throws JsonProcessingException, TelegramApiException;
+
+    Chat getChatByName(String chatName);
 
 }

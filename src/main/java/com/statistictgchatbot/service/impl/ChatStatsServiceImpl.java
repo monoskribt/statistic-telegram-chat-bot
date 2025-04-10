@@ -1,9 +1,8 @@
 package com.statistictgchatbot.service.impl;
 
-import com.statistictgchatbot.exception.ChatNotFoundException;
-import com.statistictgchatbot.model.UserEvent;
+import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.model.submodel.Message;
-import com.statistictgchatbot.repository.UserEventRepo;
+import com.statistictgchatbot.service.ChatService;
 import com.statistictgchatbot.service.ChatStatsService;
 import com.statistictgchatbot.service.MessageSender;
 import org.springframework.stereotype.Service;
@@ -16,11 +15,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChatStatsServiceImpl implements ChatStatsService {
-    private final UserEventRepo userEventRepo;
+    private final ChatService chatService;
     private final MessageSender messageSender;
 
-    public ChatStatsServiceImpl(UserEventRepo userEventRepo, MessageSender messageSender) {
-        this.userEventRepo = userEventRepo;
+    public ChatStatsServiceImpl(ChatService chatService, MessageSender messageSender) {
+        this.chatService = chatService;
         this.messageSender = messageSender;
     }
 
@@ -34,14 +33,14 @@ public class ChatStatsServiceImpl implements ChatStatsService {
         messageSender.sendMessage(chatId, mostActiveUsers.entrySet()
                 .stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .map(user -> user.getKey() + " -- " + user.getValue())
+                .map(user -> user.getKey() + " -- " + user.getValue() + " messages")
                 .collect(Collectors.joining("\n")));
     }
 
 
     private void findMostActiveUsers(String chatName) {
-        UserEvent userEventByName = getChatByName(chatName);
-        List<Message> messageList = userEventByName.getMessages();
+        Chat chatByName = chatService.getChatByName(chatName);
+        List<Message> messageList = chatByName.getMessages();
 
         ExecutorService executorService = Executors.newFixedThreadPool(5);
 
@@ -56,16 +55,5 @@ public class ChatStatsServiceImpl implements ChatStatsService {
 
         completableFuture.join();
         executorService.shutdown();
-    }
-
-    private UserEvent getChatByName(String chatName) {
-        List<UserEvent> allUsersEvent = userEventRepo.findAll();
-
-        return allUsersEvent
-                .stream()
-                .filter(chatWithName -> chatWithName.getChatName().equals(chatName))
-                .findFirst()
-                .orElseThrow(() -> new ChatNotFoundException("Chat with name " + chatName +
-                        "is not present"));
     }
 }

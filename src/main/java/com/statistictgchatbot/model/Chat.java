@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserEvent {
+public class Chat {
 
     @JsonIgnore
     @Id

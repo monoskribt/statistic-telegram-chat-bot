@@ -3,6 +3,8 @@ package com.statistictgchatbot.controller;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.BotService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Document;
@@ -12,6 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class BotController extends TelegramLongPollingBot {
 
+    private static final Logger log = LoggerFactory.getLogger(BotController.class);
     private final BotProps botProps;
     private final BotService botService;
 
@@ -40,7 +43,7 @@ public class BotController extends TelegramLongPollingBot {
                     try {
                         botService.getStats(chatId, chatName);
                     } catch (TelegramApiException e) {
-                        throw new RuntimeException(e);
+                        log.info("Problem with method getStats. TelegramApiException");
                     }
                     return;
                 }
