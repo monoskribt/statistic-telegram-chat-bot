@@ -87,13 +87,8 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Chat getChatByName(String chatName) {
-        List<Chat> allChats = chatRepo.findAll();
-
-        return allChats
-                .stream()
-                .filter(chatWithName -> chatWithName.getChatName().equals(chatName))
-                .findFirst()
-                .orElseThrow(() -> new ChatNotFoundException("Chat with name " + chatName +
-                        "is not present"));
+        return chatRepo.findByChatName(chatName)
+                .orElseThrow(() -> new ChatNotFoundException("Chat with name "
+                        + chatName + " is not present"));
     }
 }

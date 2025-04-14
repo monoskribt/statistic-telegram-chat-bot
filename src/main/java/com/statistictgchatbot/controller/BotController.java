@@ -43,7 +43,7 @@ public class BotController extends TelegramLongPollingBot {
                     try {
                         botService.getStats(chatId, chatName);
                     } catch (TelegramApiException e) {
-                        log.info("Problem with method getStats. TelegramApiException");
+                        log.warn("Problem with method getStats. TelegramApiException");
                     }
                     return;
                 }

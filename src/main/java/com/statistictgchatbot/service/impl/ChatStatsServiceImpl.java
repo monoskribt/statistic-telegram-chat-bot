@@ -1,10 +1,13 @@
 package com.statistictgchatbot.service.impl;
 
-import com.statistictgchatbot.model.Chat;
-import com.statistictgchatbot.model.submodel.Message;
+import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.service.ChatService;
 import com.statistictgchatbot.service.ChatStatsService;
 import com.statistictgchatbot.service.MessageSender;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -15,12 +18,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChatStatsServiceImpl implements ChatStatsService {
-    private final ChatService chatService;
     private final MessageSender messageSender;
+    private final MongoTemplate mongoTemplate;
 
-    public ChatStatsServiceImpl(ChatService chatService, MessageSender messageSender) {
-        this.chatService = chatService;
+    public ChatStatsServiceImpl(MessageSender messageSender,
+                                MongoTemplate mongoTemplate) {
         this.messageSender = messageSender;
+        this.mongoTemplate = mongoTemplate;
     }
 
     private final Map<String, Integer> mostActiveUsers = new ConcurrentHashMap<>();
@@ -28,32 +32,46 @@ public class ChatStatsServiceImpl implements ChatStatsService {
 
     @Override
     public void getMostActiveUsers(Long chatId, String chatName) throws TelegramApiException {
-        findMostActiveUsers(chatName);
+        List<UserMessageStatsDTO> stats = findMostActiveUsers(chatName);
 
-        messageSender.sendMessage(chatId, mostActiveUsers.entrySet()
-                .stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .map(user -> user.getKey() + " -- " + user.getValue() + " messages")
-                .collect(Collectors.joining("\n")));
+        String result = stats.stream()
+                .map(stat -> stat.getUsername() + " -- " + stat.getMessageCount() + " messages")
+                .collect(Collectors.joining("\n"));
+
+        messageSender.sendMessage(chatId, result);
     }
 
 
-    private void findMostActiveUsers(String chatName) {
-        Chat chatByName = chatService.getChatByName(chatName);
-        List<Message> messageList = chatByName.getMessages();
+    private List<UserMessageStatsDTO> findMostActiveUsers(String chatName) {
+        MatchOperation matchOperation = Aggregation
+                .match(Criteria.where("chatName").is(chatName));
 
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        UnwindOperation unwindMessages = Aggregation.unwind("messages");
 
-        CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
-            for(Message message : messageList) {
-                String user = message.getFromUser();
-                if(user != null) {
-                    mostActiveUsers.merge(user, 1, Integer::sum);
-                }
-            }
-        }, executorService);
+        GroupOperation groupByUser = Aggregation
+                .group("messages.fromUser")
+                .count()
+                .as("messageCount");
 
-        completableFuture.join();
-        executorService.shutdown();
+        SortOperation sortByCount = Aggregation
+                .sort(Sort.by(Sort.Direction.DESC, "messageCount"));
+
+        ProjectionOperation project = Aggregation.project()
+                .and("_id").as("username")
+                .andInclude("messageCount");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                unwindMessages,
+                groupByUser,
+                sortByCount,
+                project
+        );
+
+        return mongoTemplate.aggregate(
+                aggregation,
+                "chat",
+                UserMessageStatsDTO.class
+        ).getMappedResults();
     }
 }
