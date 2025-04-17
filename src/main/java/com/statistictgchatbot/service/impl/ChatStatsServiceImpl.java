@@ -1,7 +1,6 @@
 package com.statistictgchatbot.service.impl;
 
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
-import com.statistictgchatbot.service.ChatService;
 import com.statistictgchatbot.service.ChatStatsService;
 import com.statistictgchatbot.service.MessageSender;
 import org.springframework.data.domain.Sort;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,8 +23,6 @@ public class ChatStatsServiceImpl implements ChatStatsService {
         this.messageSender = messageSender;
         this.mongoTemplate = mongoTemplate;
     }
-
-    private final Map<String, Integer> mostActiveUsers = new ConcurrentHashMap<>();
 
 
     @Override

@@ -17,7 +17,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class ChatServiceImpl implements ChatService {
