@@ -8,11 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
+import java.util.Optional;
 
 @Component
 public class FileServiceImpl implements FileService {
@@ -38,7 +36,9 @@ public class FileServiceImpl implements FileService {
             log.info("Content from url: {}", jsonBuilder);
 
             JSONObject jsonObject = new JSONObject(jsonBuilder.toString());
-            String filePath = jsonObject.getJSONObject("result").getString("file_path");
+            String filePath = jsonObject
+                    .getJSONObject("result")
+                    .getString("file_path");
 
             URL fileUrl = new URL("https://api.telegram.org/file/bot" + botProps.token() + "/" + filePath);
             log.info("File url: {}", fileUrl);
@@ -47,7 +47,17 @@ public class FileServiceImpl implements FileService {
                 java.io.File localFile =
                         new java.io.File("src/main/resources/uploaded/" + fileName);
                 FileUtils.copyInputStreamToFile(inputStream, localFile);
+                log.info("File successfully saved");
             }
         }
     }
+
+    @Override
+    public void deleteFileFromLocal(String fileName) {
+        File file = new File("src/main/resources/uploaded/" + fileName);
+        Optional.of(file)
+                .filter(File::exists)
+                .ifPresent(File::delete);
+    }
+
 }
