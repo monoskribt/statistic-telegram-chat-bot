@@ -1,5 +1,6 @@
 package com.statistictgchatbot.controller;
 
+import com.statistictgchatbot.constant.BotCommands;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.BotService;
@@ -37,15 +38,24 @@ public class BotController extends TelegramLongPollingBot {
 
             if (update.getMessage().hasText()) {
                 String messageText = update.getMessage().getText();
+                String[] arrMessages = messageText.split("\\s+");
+                String chatName = arrMessages[arrMessages.length - 1];
 
-                if (messageText.startsWith("/stats")) {
-                    String chatName = messageText.replace("/stats", "").trim();
+                if (messageText.startsWith(BotCommands.MOST_ACTIVE_USERS) ||
+                    messageText.startsWith(BotCommands.MOST_INACTIVE_USERS)) {
                     try {
-                        botService.getStats(chatId, chatName);
+                        botService.getUserActivity(chatId, chatName, messageText);
                     } catch (TelegramApiException e) {
-                        log.warn("Problem with method getStats. TelegramApiException");
+                        log.warn("Problem with method getStats or chat name");
                     }
                     return;
+                }
+                if(messageText.startsWith(BotCommands.INACTIVE_BY_WEEK)) {
+                    try {
+                        botService.getInactiveUserByWeek(chatId, chatName);
+                    } catch (TelegramApiException e) {
+                        log.warn("Problem with method getInactiveUserByWeek or chat name");
+                    }
                 }
             }
 

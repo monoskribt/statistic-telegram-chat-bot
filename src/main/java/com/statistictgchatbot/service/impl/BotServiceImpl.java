@@ -45,7 +45,12 @@ public class BotServiceImpl implements BotService {
     }
 
     @Override
-    public void getStats(Long chatId, String chatName) throws TelegramApiException {
-        chatStatsService.getMostActiveUsers(chatId, chatName);
+    public void getUserActivity(Long chatId, String chatName, String messageText) throws TelegramApiException {
+        chatStatsService.getUserActivity(chatId, chatName, messageText);
+    }
+
+    @Override
+    public void getInactiveUserByWeek(Long chatId, String chatName) throws TelegramApiException {
+        chatStatsService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
     }
 }
