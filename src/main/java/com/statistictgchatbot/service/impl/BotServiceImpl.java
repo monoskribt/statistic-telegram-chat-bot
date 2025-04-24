@@ -53,4 +53,9 @@ public class BotServiceImpl implements BotService {
     public void getInactiveUserByWeek(Long chatId, String chatName) throws TelegramApiException {
         chatStatsService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
     }
+
+    @Override
+    public void getAverageMessagePerDay(Long chatId, String chatName) throws TelegramApiException {
+        chatStatsService.getAverageMessagesPerDayByLastMonth(chatId, chatName);
+    }
 }

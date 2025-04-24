@@ -57,6 +57,13 @@ public class BotController extends TelegramLongPollingBot {
                         log.warn("Problem with method getInactiveUserByWeek or chat name");
                     }
                 }
+                if(messageText.startsWith(BotCommands.AVERAGE_MESSAGE_PER_DAY)) {
+                    try {
+                        botService.getAverageMessagePerDay(chatId, chatName);
+                    } catch (TelegramApiException e) {
+                        log.warn("Problem with method getAverageMessagePerDay or chat name");
+                    }
+                }
             }
 
             if (update.getMessage().hasDocument()) {

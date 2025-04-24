@@ -1,6 +1,7 @@
 package com.statistictgchatbot.service.impl;
 
 import com.statistictgchatbot.constant.BotCommands;
+import com.statistictgchatbot.dto.MessageStatsDTO;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.service.ChatStatsService;
 import com.statistictgchatbot.service.MessageSender;
@@ -11,7 +12,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -131,6 +134,60 @@ public class ChatStatsServiceImpl implements ChatStatsService {
                 aggregation,
                 "chat",
                 UserMessageStatsDTO.class
+        ).getMappedResults();
+    }
+
+    @Override
+    public void getAverageMessagesPerDayByLastMonth(Long chatId, String chatName) throws TelegramApiException {
+        List<MessageStatsDTO> averageMessages = getAverageMessagesPerDayByLastMonth(chatName);
+
+        String result = averageMessages
+                .stream()
+                .map(messageStat -> messageStat.getTotalMessage() + " total message" + " \n"
+                    + messageStat.getAverageMessagesPerDay() + " average message")
+                .collect(Collectors.joining());
+
+        messageSender.sendMessage(chatId, result);
+    }
+
+    private List<MessageStatsDTO> getAverageMessagesPerDayByLastMonth(String chatName) {
+        UnwindOperation unwindOperation = Aggregation.unwind("messages");
+
+        MatchOperation matchOperation = Aggregation.match(
+                Criteria.where("chatName").is(chatName)
+                        .and("messages.createAt").gte(LocalDate.now().minusDays(30))
+        );
+
+        ProjectionOperation projectOperation = Aggregation.project()
+                .and("messages.createAt").dateAsFormattedString("%Y-%m-%d").as("date");
+
+        GroupOperation groupOperation = Aggregation
+                .group("chatName", "date")
+                .count().as("messagesPerDay");
+
+        GroupOperation totalMessagesGroupOperation = Aggregation
+                .group("chatName")
+                .sum("messagesPerDay").as("totalMessages")
+                .count().as("daysCount");
+
+        ProjectionOperation avgProjectionOperation = Aggregation.project()
+                .and("totalMessages").as("totalMessage")
+                .andExpression("totalMessages / daysCount").as("averageMessagesPerDay");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                unwindOperation,
+                matchOperation,
+                projectOperation,
+                groupOperation,
+                totalMessagesGroupOperation,
+                avgProjectionOperation
+        );
+
+
+        return mongoTemplate.aggregate(
+                aggregation,
+                "chat",
+                MessageStatsDTO.class
         ).getMappedResults();
     }
 }
