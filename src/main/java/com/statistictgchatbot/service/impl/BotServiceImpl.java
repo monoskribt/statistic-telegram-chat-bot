@@ -1,5 +1,6 @@
 package com.statistictgchatbot.service.impl;
 
+import com.statistictgchatbot.constant.MessageToUser;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.service.*;
@@ -50,12 +51,17 @@ public class BotServiceImpl implements BotService {
     }
 
     @Override
-    public void getInactiveUserByWeek(Long chatId, String chatName) throws TelegramApiException {
+    public void getInactiveUsersForAWeek(Long chatId, String chatName) throws TelegramApiException {
         chatStatsService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
     }
 
     @Override
     public void getAverageMessagePerDay(Long chatId, String chatName) throws TelegramApiException {
         chatStatsService.getAverageMessagesPerDayByLastMonth(chatId, chatName);
+    }
+
+    @Override
+    public void sendDefaultMessage(Long chatId) throws TelegramApiException {
+        messageSender.sendMessage(chatId, MessageToUser.UNKNOWN_COMMAND);
     }
 }

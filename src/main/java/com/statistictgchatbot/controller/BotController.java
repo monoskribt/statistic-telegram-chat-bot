@@ -4,6 +4,7 @@ import com.statistictgchatbot.constant.BotCommands;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.BotService;
+import com.statistictgchatbot.util.CommandUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.Objects;
 
 @Component
 public class BotController extends TelegramLongPollingBot {
@@ -38,31 +41,24 @@ public class BotController extends TelegramLongPollingBot {
 
             if (update.getMessage().hasText()) {
                 String messageText = update.getMessage().getText();
-                String[] arrMessages = messageText.split("\\s+");
-                String chatName = arrMessages[arrMessages.length - 1];
+                String[] splitMessage = messageText.split("\\s+");
+                String chatName = splitMessage[splitMessage.length - 1];
 
-                if (messageText.startsWith(BotCommands.MOST_ACTIVE_USERS) ||
-                    messageText.startsWith(BotCommands.MOST_INACTIVE_USERS)) {
-                    try {
-                        botService.getUserActivity(chatId, chatName, messageText);
-                    } catch (TelegramApiException e) {
-                        log.warn("Problem with method getStats or chat name");
+                String command = CommandUtils.getCommandFromMessage(messageText);
+
+                try {
+                    switch (Objects.requireNonNull(command)) {
+                        case BotCommands.MOST_ACTIVE_USERS, BotCommands.MOST_INACTIVE_USERS ->
+                                botService.getUserActivity(chatId, chatName, messageText);
+                        case BotCommands.INACTIVE_BY_WEEK ->
+                                botService.getInactiveUsersForAWeek(chatId, chatName);
+                        case BotCommands.AVERAGE_MESSAGE_PER_DAY ->
+                                botService.getAverageMessagePerDay(chatId, chatName);
+                        case BotCommands.UNKNOWN_COMMAND ->
+                            botService.sendDefaultMessage(chatId);
                     }
-                    return;
-                }
-                if(messageText.startsWith(BotCommands.INACTIVE_BY_WEEK)) {
-                    try {
-                        botService.getInactiveUserByWeek(chatId, chatName);
-                    } catch (TelegramApiException e) {
-                        log.warn("Problem with method getInactiveUserByWeek or chat name");
-                    }
-                }
-                if(messageText.startsWith(BotCommands.AVERAGE_MESSAGE_PER_DAY)) {
-                    try {
-                        botService.getAverageMessagePerDay(chatId, chatName);
-                    } catch (TelegramApiException e) {
-                        log.warn("Problem with method getAverageMessagePerDay or chat name");
-                    }
+                } catch (TelegramApiException e) {
+                    log.warn("Problem with chat name or method");
                 }
             }
 

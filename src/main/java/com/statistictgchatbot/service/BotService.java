@@ -12,9 +12,11 @@ public interface BotService {
     void getUserActivity(Long chatId, String chatName, String messageText)
             throws TelegramApiException;
 
-    void getInactiveUserByWeek(Long chatId, String chatName)
+    void getInactiveUsersForAWeek(Long chatId, String chatName)
             throws TelegramApiException;
 
     void getAverageMessagePerDay(Long chatId, String chatName)
             throws TelegramApiException;
+
+    void sendDefaultMessage(Long chatId) throws TelegramApiException;
 }
