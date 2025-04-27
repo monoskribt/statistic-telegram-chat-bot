@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
 import java.util.Objects;
 
 @Component
@@ -54,10 +55,12 @@ public class BotController extends TelegramLongPollingBot {
                                 botService.getInactiveUsersForAWeek(chatId, chatName);
                         case BotCommands.AVERAGE_MESSAGE_PER_DAY ->
                                 botService.getAverageMessagePerDay(chatId, chatName);
+                        case BotCommands.CHAT_REPORT ->
+                                botService.getChatReport(chatId, chatName);
                         case BotCommands.UNKNOWN_COMMAND ->
                             botService.sendDefaultMessage(chatId);
                     }
-                } catch (TelegramApiException e) {
+                } catch (TelegramApiException | IOException e) {
                     log.warn("Problem with chat name or method");
                 }
             }

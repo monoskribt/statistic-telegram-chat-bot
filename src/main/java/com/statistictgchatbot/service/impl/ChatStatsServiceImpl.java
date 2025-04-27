@@ -3,18 +3,24 @@ package com.statistictgchatbot.service.impl;
 import com.statistictgchatbot.constant.BotCommands;
 import com.statistictgchatbot.dto.MessageStatsDTO;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
+import com.statistictgchatbot.dto.WeeklyMessageStatsDTO;
 import com.statistictgchatbot.service.ChatStatsService;
 import com.statistictgchatbot.service.MessageSender;
+import com.statistictgchatbot.util.GeneratorStatsPicture;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -188,6 +194,90 @@ public class ChatStatsServiceImpl implements ChatStatsService {
                 aggregation,
                 "chat",
                 MessageStatsDTO.class
+        ).getMappedResults();
+    }
+
+    @Override
+    public void prepareStatisticCountOfMessageToGraph(Long chatId, String chatName) throws TelegramApiException, IOException {
+        List<WeeklyMessageStatsDTO> stats = prepareStatisticCountOfMessageToGraph(chatName);
+
+        GeneratorStatsPicture.buildChart(stats, "src/main/resources/uploaded/stats.png");
+
+        int totalMessages = stats
+                .stream()
+                .mapToInt(WeeklyMessageStatsDTO::getMessageCount)
+                .sum();
+
+        double averageMessages = stats
+                .stream()
+                .mapToInt(WeeklyMessageStatsDTO::getMessageCount)
+                .average()
+                .orElse(0);
+
+        WeeklyMessageStatsDTO mostActiveWeek = stats
+                .stream()
+                .max(Comparator
+                        .comparingInt(WeeklyMessageStatsDTO::getMessageCount))
+                .orElse(null);
+
+        String report = String.format(
+                """
+                📊 Messages report:
+    
+                • Total messages: %d
+                • Average messages per week: %.2f
+                • Most active week: %d year, %d week (%d messages)
+                """,
+                totalMessages,
+                averageMessages,
+                mostActiveWeek != null ? mostActiveWeek.getYear() : 0,
+                mostActiveWeek != null ? mostActiveWeek.getWeek() : 0,
+                mostActiveWeek != null ? mostActiveWeek.getMessageCount() : 0
+        );
+
+        messageSender.sendMessage(chatId, report);
+
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(chatId);
+        sendPhoto.setPhoto(new InputFile(new File("src/main/resources/uploaded/stats.png")));
+
+        messageSender.sendPhoto(chatId, sendPhoto);
+    }
+
+    private List<WeeklyMessageStatsDTO> prepareStatisticCountOfMessageToGraph(String chatName) {
+        UnwindOperation unwindOperation = Aggregation.unwind("messages");
+
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("chatName")
+                .is(chatName));
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .andExpression("year(messages.createAt)").as("year")
+                .andExpression("isoWeek(messages.createAt)").as("week");
+
+        GroupOperation groupOperation = Aggregation.group("year", "week")
+                .count().as("messageCount");
+
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Order.asc("_id.year"),
+                Sort.Order.asc("_id.week")));
+
+        ProjectionOperation finalProjectOperation = Aggregation.project()
+                .and("_id.year").as("year")
+                .and("_id.week").as("week")
+                .and("messageCount").as("messageCount");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                unwindOperation,
+                matchOperation,
+                projectionOperation,
+                groupOperation,
+                sortOperation,
+                finalProjectOperation
+        );
+
+        return mongoTemplate.aggregate(
+                aggregation,
+                "chat",
+                WeeklyMessageStatsDTO.class
         ).getMappedResults();
     }
 }

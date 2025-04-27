@@ -61,6 +61,12 @@ public class BotServiceImpl implements BotService {
     }
 
     @Override
+    public void getChatReport(Long chatId, String chatName) throws TelegramApiException, IOException {
+        chatStatsService.prepareStatisticCountOfMessageToGraph(chatId, chatName);
+    }
+
+
+    @Override
     public void sendDefaultMessage(Long chatId) throws TelegramApiException {
         messageSender.sendMessage(chatId, MessageToUser.UNKNOWN_COMMAND);
     }

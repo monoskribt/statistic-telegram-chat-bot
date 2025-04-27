@@ -3,6 +3,7 @@ package com.statistictgchatbot.service.impl;
 import com.statistictgchatbot.service.MessageSender;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -23,5 +24,11 @@ public class MessageSenderImpl implements MessageSender {
                 .text(text)
                 .build();
         absSender.execute(sendMessage);
+    }
+
+    @Override
+    public void sendPhoto(Long chatId, SendPhoto sendPhoto) throws TelegramApiException {
+        sendPhoto.setChatId(chatId);
+        absSender.execute(sendPhoto);
     }
 }

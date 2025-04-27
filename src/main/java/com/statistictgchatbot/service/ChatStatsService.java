@@ -2,6 +2,8 @@ package com.statistictgchatbot.service;
 
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
+
 public interface ChatStatsService {
 
     void getUserActivity(Long chatId,
@@ -14,4 +16,7 @@ public interface ChatStatsService {
 
     void getAverageMessagesPerDayByLastMonth(Long chatId,
                                  String chatName) throws TelegramApiException;
+
+    void prepareStatisticCountOfMessageToGraph(Long chatId,
+                                               String chatName) throws TelegramApiException, IOException;
 }

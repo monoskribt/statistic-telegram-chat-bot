@@ -3,6 +3,8 @@ package com.statistictgchatbot.service;
 
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
+
 public interface BotService {
 
     void documentProcessing(String fileName,
@@ -17,6 +19,9 @@ public interface BotService {
 
     void getAverageMessagePerDay(Long chatId, String chatName)
             throws TelegramApiException;
+
+    void getChatReport(Long chatId, String chatName)
+            throws TelegramApiException, IOException;
 
     void sendDefaultMessage(Long chatId) throws TelegramApiException;
 }

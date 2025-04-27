@@ -13,7 +13,9 @@ public class CommandUtils {
             return BotCommands.INACTIVE_BY_WEEK;
         } else if (messageText.startsWith(BotCommands.AVERAGE_MESSAGE_PER_DAY)) {
             return BotCommands.AVERAGE_MESSAGE_PER_DAY;
-        } else {
+        } else if(messageText.startsWith(BotCommands.CHAT_REPORT)) {
+            return BotCommands.CHAT_REPORT;
+        }else {
             return BotCommands.UNKNOWN_COMMAND;
         }
     }

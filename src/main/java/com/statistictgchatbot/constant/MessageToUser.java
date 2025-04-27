@@ -11,5 +11,6 @@ public class MessageToUser {
                     "/activeusers {your chat name} - shows the most active users in the chat\n" +
                     "/inactiveusers {your chat name} - shows the most inactive users in the chat\n" +
                     "/inactivebyweek {your chat name} - shows users who have not done any actions in the chat for a week\n" +
-                    "/avgmessages {your chat name} - shows the average number of messages per month for the chat";
+                    "/avgmessages {your chat name} - shows the average number of messages per month for the chat\n" +
+                    "/chatreport {your chat name} - shows a report based on statistics from the selected chat";
 }
