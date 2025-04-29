@@ -15,4 +15,6 @@ public interface ChatService {
 
     Chat getChatByName(String chatName);
 
+    boolean chatIsExist(String chatName);
+
 }

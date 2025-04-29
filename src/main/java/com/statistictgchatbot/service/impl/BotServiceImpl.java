@@ -1,5 +1,7 @@
 package com.statistictgchatbot.service.impl;
 
+import com.statistictgchatbot.annotation.CheckChatExists;
+import com.statistictgchatbot.constant.MessageToUser;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.service.*;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
+
+import static com.statistictgchatbot.constant.Constants.PATH_TO_UPLOADED_FILE;
 
 @Service
 public class BotServiceImpl implements BotService {
@@ -34,7 +38,7 @@ public class BotServiceImpl implements BotService {
         try {
             fileService.uploadFile(fileName, fieldId);
             Chat chat = chatService
-                    .parseChatFromFile("src/main/resources/uploaded/" + fileName);
+                    .parseChatFromFile(PATH_TO_UPLOADED_FILE + fileName);
             chatService.saveChatEntity(chat, chatId);
             fileService.deleteFileFromLocal(fileName);
         } catch (IOException | TelegramApiException e) {
@@ -44,8 +48,33 @@ public class BotServiceImpl implements BotService {
         }
     }
 
+    @CheckChatExists
     @Override
-    public void getStats(Long chatId, String chatName) throws TelegramApiException {
-        chatStatsService.getMostActiveUsers(chatId, chatName);
+    public void getUserActivity(Long chatId, String chatName, String messageText) throws TelegramApiException {
+        chatStatsService.getUserActivity(chatId, chatName, messageText);
+    }
+
+    @CheckChatExists
+    @Override
+    public void getInactiveUsersForAWeek(Long chatId, String chatName) throws TelegramApiException {
+        chatStatsService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
+    }
+
+    @CheckChatExists
+    @Override
+    public void getAverageMessagePerDay(Long chatId, String chatName) throws TelegramApiException {
+        chatStatsService.getAverageMessagesPerDayByLastMonth(chatId, chatName);
+    }
+
+    @CheckChatExists
+    @Override
+    public void getChatReport(Long chatId, String chatName) throws TelegramApiException, IOException {
+        chatStatsService.prepareStatisticCountOfMessageToGraph(chatId, chatName);
+    }
+
+
+    @Override
+    public void sendDefaultMessage(Long chatId) throws TelegramApiException {
+        messageSender.sendMessage(chatId, MessageToUser.UNKNOWN_COMMAND);
     }
 }
