@@ -12,6 +12,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.Optional;
 
+import static com.statistictgchatbot.constant.Constants.PATH_TO_UPLOADED_FILE;
+
 @Component
 public class FileServiceImpl implements FileService {
 
@@ -45,7 +47,7 @@ public class FileServiceImpl implements FileService {
 
             try (InputStream inputStream = fileUrl.openStream()) {
                 java.io.File localFile =
-                        new java.io.File("src/main/resources/uploaded/" + fileName);
+                        new java.io.File(PATH_TO_UPLOADED_FILE + fileName);
                 FileUtils.copyInputStreamToFile(inputStream, localFile);
                 log.info("File successfully saved");
             }
@@ -54,7 +56,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteFileFromLocal(String fileName) {
-        File file = new File("src/main/resources/uploaded/" + fileName);
+        File file = new File(PATH_TO_UPLOADED_FILE + fileName);
         Optional.of(file)
                 .filter(File::exists)
                 .ifPresent(File::delete);

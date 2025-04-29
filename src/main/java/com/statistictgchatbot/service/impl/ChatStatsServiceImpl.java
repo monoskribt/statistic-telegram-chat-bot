@@ -5,6 +5,7 @@ import com.statistictgchatbot.dto.MessageStatsDTO;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.dto.WeeklyMessageStatsDTO;
 import com.statistictgchatbot.service.ChatStatsService;
+import com.statistictgchatbot.service.FileService;
 import com.statistictgchatbot.service.MessageSender;
 import com.statistictgchatbot.util.GeneratorStatsPicture;
 import org.springframework.data.domain.Sort;
@@ -12,28 +13,32 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.statistictgchatbot.constant.Constants.PATH_TO_PICTURE_WITH_CHAT_STATS;
+import static com.statistictgchatbot.util.FormattingMessage.formatReportMessage;
 
 @Service
 public class ChatStatsServiceImpl implements ChatStatsService {
     private final MessageSender messageSender;
     private final MongoTemplate mongoTemplate;
+    private final FileService fileService;
 
     public ChatStatsServiceImpl(MessageSender messageSender,
-                                MongoTemplate mongoTemplate) {
+                                MongoTemplate mongoTemplate,
+                                FileService fileService) {
         this.messageSender = messageSender;
         this.mongoTemplate = mongoTemplate;
+        this.fileService = fileService;
     }
 
 
@@ -199,9 +204,10 @@ public class ChatStatsServiceImpl implements ChatStatsService {
 
     @Override
     public void prepareStatisticCountOfMessageToGraph(Long chatId, String chatName) throws TelegramApiException, IOException {
-        List<WeeklyMessageStatsDTO> stats = prepareStatisticCountOfMessageToGraph(chatName);
+        List<WeeklyMessageStatsDTO> stats = Optional.of(prepareStatisticCountOfMessageToGraph(chatName))
+                        .orElseThrow(() -> new IllegalArgumentException("WeeklyMessageStatsDTO is empty"));
 
-        GeneratorStatsPicture.buildChart(stats, "src/main/resources/uploaded/stats.png");
+        GeneratorStatsPicture.buildChart(stats, PATH_TO_PICTURE_WITH_CHAT_STATS);
 
         int totalMessages = stats
                 .stream()
@@ -220,28 +226,13 @@ public class ChatStatsServiceImpl implements ChatStatsService {
                         .comparingInt(WeeklyMessageStatsDTO::getMessageCount))
                 .orElse(null);
 
-        String report = String.format(
-                """
-                📊 Messages report:
-    
-                • Total messages: %d
-                • Average messages per week: %.2f
-                • Most active week: %d year, %d week (%d messages)
-                """,
-                totalMessages,
-                averageMessages,
-                mostActiveWeek != null ? mostActiveWeek.getYear() : 0,
-                mostActiveWeek != null ? mostActiveWeek.getWeek() : 0,
-                mostActiveWeek != null ? mostActiveWeek.getMessageCount() : 0
-        );
+        String report = formatReportMessage(totalMessages, averageMessages, mostActiveWeek);
 
         messageSender.sendMessage(chatId, report);
+        messageSender.sendPhoto(chatId, PATH_TO_PICTURE_WITH_CHAT_STATS);
 
-        SendPhoto sendPhoto = new SendPhoto();
-        sendPhoto.setChatId(chatId);
-        sendPhoto.setPhoto(new InputFile(new File("src/main/resources/uploaded/stats.png")));
+        fileService.deleteFileFromLocal("stats.png");
 
-        messageSender.sendPhoto(chatId, sendPhoto);
     }
 
     private List<WeeklyMessageStatsDTO> prepareStatisticCountOfMessageToGraph(String chatName) {

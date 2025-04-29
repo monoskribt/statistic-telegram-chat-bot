@@ -7,5 +7,5 @@ public interface MessageSender {
 
     void sendMessage(Long id, String text) throws TelegramApiException;
 
-    void sendPhoto(Long chatId, SendPhoto sendPhoto) throws TelegramApiException;
+    void sendPhoto(Long chatId, String pathName) throws TelegramApiException;
 }

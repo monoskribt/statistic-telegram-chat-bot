@@ -1,12 +1,13 @@
 package com.statistictgchatbot.dto;
 
+
 public class WeeklyMessageStatsDTO {
 
-    private int year;
-    private int week;
-    private int messageCount;
+    private Integer year;
+    private Integer week;
+    private Integer messageCount;
 
-    public WeeklyMessageStatsDTO(int year, int week, int messageCount) {
+    public WeeklyMessageStatsDTO(Integer year, Integer week, Integer messageCount) {
         this.year = year;
         this.week = week;
         this.messageCount = messageCount;
@@ -15,7 +16,7 @@ public class WeeklyMessageStatsDTO {
     public WeeklyMessageStatsDTO() {
     }
 
-    public int getYear() {
+    public Integer getYear() {
         return year;
     }
 
@@ -23,7 +24,7 @@ public class WeeklyMessageStatsDTO {
         this.year = year;
     }
 
-    public int getWeek() {
+    public Integer getWeek() {
         return week;
     }
 
@@ -31,7 +32,7 @@ public class WeeklyMessageStatsDTO {
         this.week = week;
     }
 
-    public int getMessageCount() {
+    public Integer getMessageCount() {
         return messageCount;
     }
 

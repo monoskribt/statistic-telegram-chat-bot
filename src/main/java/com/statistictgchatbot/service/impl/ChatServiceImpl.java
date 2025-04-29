@@ -2,7 +2,6 @@ package com.statistictgchatbot.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.statistictgchatbot.constant.MessageToUser;
 import com.statistictgchatbot.exception.ChatNotFoundException;
 import com.statistictgchatbot.exception.ParseFileException;
 import com.statistictgchatbot.model.Chat;
@@ -17,6 +16,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.statistictgchatbot.constant.MessageToUser.*;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -50,7 +51,7 @@ public class ChatServiceImpl implements ChatService {
         chat.setId(hashId);
 
         if(chatRepo.existsById(hashId)) {
-            messageSender.sendMessage(chatId, MessageToUser.ALREADY_EXISTS);
+            messageSender.sendMessage(chatId, ALREADY_EXISTS);
             log.info("Chat history is already present");
             return;
         }
@@ -71,14 +72,14 @@ public class ChatServiceImpl implements ChatService {
             if (existingSizeOfMessages < newSizeOfMessages) {
                 chatRepo.delete(existingChat);
                 chatRepo.save(chat);
-                messageSender.sendMessage(chatId, MessageToUser.SUCCESSFULLY_UPDATED);
+                messageSender.sendMessage(chatId, SUCCESSFULLY_UPDATED);
                 log.info("Chat was successfully updated with new messages");
             } else {
-                messageSender.sendMessage(chatId, MessageToUser.CHAT_WAS_NOT_SAVED);
+                messageSender.sendMessage(chatId, CHAT_WAS_NOT_SAVED);
             }
         } catch (ChatNotFoundException e) {
             chatRepo.save(chat);
-            messageSender.sendMessage(chatId, MessageToUser.SUCCESSFULLY_SAVED);
+            messageSender.sendMessage(chatId, SUCCESSFULLY_SAVED);
             log.info("Chat history saved");
         }
     }
@@ -89,5 +90,10 @@ public class ChatServiceImpl implements ChatService {
         return chatRepo.findByChatName(chatName)
                 .orElseThrow(() -> new ChatNotFoundException("Chat with name "
                         + chatName + " is not present"));
+    }
+
+    @Override
+    public boolean chatIsExist(String chatName) {
+        return chatRepo.existsByChatName(chatName);
     }
 }
