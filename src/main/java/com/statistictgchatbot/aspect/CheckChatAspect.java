@@ -2,11 +2,9 @@ package com.statistictgchatbot.aspect;
 
 import com.statistictgchatbot.service.ChatService;
 import com.statistictgchatbot.service.MessageSender;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import static com.statistictgchatbot.constant.MessageToUser.CHAT_DOES_NOT_FOUND;
