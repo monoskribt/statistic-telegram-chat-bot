@@ -3,12 +3,11 @@ package com.statistictgchatbot.model.submodel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.statistictgchatbot.constant.MediaType;
-import com.statistictgchatbot.constant.TypeOfEvent;
+import com.statistictgchatbot.constant.message_entity_constant.Action;
+import com.statistictgchatbot.constant.message_entity_constant.MediaType;
+import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.util.TextDeserialize;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
@@ -28,6 +27,18 @@ public class Message {
 
     @JsonProperty(value = "edited")
     private Date editedAt;
+
+    @JsonProperty(value = "actor")
+    private String actor;
+
+    @JsonProperty(value = "actor_id")
+    private String actorId;
+
+    @JsonProperty(value = "action")
+    private Action action;
+
+    @JsonProperty(value = "members")
+    private List<String> members;
 
     @JsonProperty(value = "from")
     private String fromUser;

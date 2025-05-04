@@ -1,4 +1,4 @@
-package com.statistictgchatbot.constant;
+package com.statistictgchatbot.constant.message_entity_constant;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
