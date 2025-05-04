@@ -18,16 +18,16 @@ public class BotServiceImpl implements BotService {
 
     private final ChatService chatService;
     private final FileService fileService;
-    private final ChatStatsService chatStatsService;
+    private final ChatActivityByDocumentService chatActivityByDocumentService;
     private final MessageSender messageSender;
 
     public BotServiceImpl(@Lazy ChatService chatService,
                           @Lazy FileService fileService,
                           @Lazy MessageSender messageSender,
-                          @Lazy ChatStatsService chatStatsService) {
+                          @Lazy ChatActivityByDocumentService chatActivityByDocumentService) {
         this.chatService = chatService;
         this.fileService = fileService;
-        this.chatStatsService = chatStatsService;
+        this.chatActivityByDocumentService = chatActivityByDocumentService;
         this.messageSender = messageSender;
     }
 
@@ -51,25 +51,25 @@ public class BotServiceImpl implements BotService {
     @CheckChatExists
     @Override
     public void getUserActivity(Long chatId, String chatName, String messageText) throws TelegramApiException {
-        chatStatsService.getUserActivity(chatId, chatName, messageText);
+        chatActivityByDocumentService.getUserActivity(chatId, chatName, messageText);
     }
 
     @CheckChatExists
     @Override
     public void getInactiveUsersForAWeek(Long chatId, String chatName) throws TelegramApiException {
-        chatStatsService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
+        chatActivityByDocumentService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
     }
 
     @CheckChatExists
     @Override
     public void getAverageMessagePerDay(Long chatId, String chatName) throws TelegramApiException {
-        chatStatsService.getAverageMessagesPerDayByLastMonth(chatId, chatName);
+        chatActivityByDocumentService.getAverageMessagesPerDayByLastMonth(chatId, chatName);
     }
 
     @CheckChatExists
     @Override
     public void getChatReport(Long chatId, String chatName) throws TelegramApiException, IOException {
-        chatStatsService.prepareStatisticCountOfMessageToGraph(chatId, chatName);
+        chatActivityByDocumentService.prepareStatisticCountOfMessageToGraph(chatId, chatName);
     }
 
 

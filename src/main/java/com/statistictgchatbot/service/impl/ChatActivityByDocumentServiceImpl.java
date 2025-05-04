@@ -4,7 +4,7 @@ import com.statistictgchatbot.constant.BotCommands;
 import com.statistictgchatbot.dto.MessageStatsDTO;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.dto.WeeklyMessageStatsDTO;
-import com.statistictgchatbot.service.ChatStatsService;
+import com.statistictgchatbot.service.ChatActivityByDocumentService;
 import com.statistictgchatbot.service.FileService;
 import com.statistictgchatbot.service.MessageSender;
 import com.statistictgchatbot.util.GeneratorStatsPicture;
@@ -28,14 +28,14 @@ import static com.statistictgchatbot.constant.Constants.PATH_TO_PICTURE_WITH_CHA
 import static com.statistictgchatbot.util.FormattingMessage.formatReportMessage;
 
 @Service
-public class ChatStatsServiceImpl implements ChatStatsService {
+public class ChatActivityByDocumentServiceImpl implements ChatActivityByDocumentService {
     private final MessageSender messageSender;
     private final MongoTemplate mongoTemplate;
     private final FileService fileService;
 
-    public ChatStatsServiceImpl(MessageSender messageSender,
-                                MongoTemplate mongoTemplate,
-                                FileService fileService) {
+    public ChatActivityByDocumentServiceImpl(MessageSender messageSender,
+                                             MongoTemplate mongoTemplate,
+                                             FileService fileService) {
         this.messageSender = messageSender;
         this.mongoTemplate = mongoTemplate;
         this.fileService = fileService;
