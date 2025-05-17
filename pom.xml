@@ -62,12 +62,17 @@
 			<artifactId>telegrambots-meta</artifactId>
 			<version>8.3.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots-client</artifactId>
+			<version>8.3.0</version>
+		</dependency>
 
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.11.0</version> <!-- или последнюю стабильную -->
+			<version>2.11.0</version>
 		</dependency>
 
 		<dependency>

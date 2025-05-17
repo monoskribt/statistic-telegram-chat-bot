@@ -17,17 +17,10 @@ import java.util.List;
 public class BotController implements LongPollingUpdateConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(BotController.class);
-    private final BotProps botProps;
     private final UpdateReceivedService updateReceivedService;
 
-    public BotController(BotProps botProps,
-                         UpdateReceivedService updateReceivedService) {
-        this.botProps = botProps;
+    public BotController(UpdateReceivedService updateReceivedService) {
         this.updateReceivedService = updateReceivedService;
-    }
-
-    public void onUpdateReceived(Update update) {
-
     }
 
     @Override

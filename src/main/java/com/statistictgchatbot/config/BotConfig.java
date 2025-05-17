@@ -2,9 +2,9 @@ package com.statistictgchatbot.config;
 
 import com.statistictgchatbot.controller.BotController;
 import com.statistictgchatbot.props.BotProps;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.BotSession;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
@@ -12,6 +12,7 @@ import org.telegram.telegrambots.longpolling.util.DefaultGetUpdatesGenerator;
 import org.telegram.telegrambots.meta.TelegramUrl;
 import org.telegram.telegrambots.meta.api.methods.updates.GetUpdates;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,11 @@ public class BotConfig {
 
     public BotConfig(BotProps botProps) {
         this.botProps = botProps;
+    }
+
+    @Bean
+    public TelegramClient telegramClient() {
+        return new OkHttpTelegramClient(botProps.token());
     }
 
     @Bean
