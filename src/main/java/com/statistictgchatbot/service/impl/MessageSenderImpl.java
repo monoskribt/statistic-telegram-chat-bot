@@ -1,22 +1,24 @@
 package com.statistictgchatbot.service.impl;
 
+import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.MessageSender;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.io.File;
 
 @Service
 public class MessageSenderImpl implements MessageSender {
 
-    private final AbsSender absSender;
 
-    public MessageSenderImpl(AbsSender absSender) {
-        this.absSender = absSender;
+    private final TelegramClient telegramClient;
+
+    public MessageSenderImpl(TelegramClient telegramClient, BotProps botProps) {
+        this.telegramClient = telegramClient;
     }
 
     @Override
@@ -26,7 +28,7 @@ public class MessageSenderImpl implements MessageSender {
                 .parseMode("Markdown")
                 .text(text)
                 .build();
-        absSender.execute(sendMessage);
+        telegramClient.execute(sendMessage);
     }
 
     @Override
@@ -35,6 +37,6 @@ public class MessageSenderImpl implements MessageSender {
                 .chatId(chatId)
                 .photo(new InputFile(new File(pathName)))
                 .build();
-        absSender.execute(sendPhoto);
+        telegramClient.execute(sendPhoto);
     }
 }
