@@ -36,7 +36,6 @@ public class BotConfig {
                         new DefaultGetUpdatesGenerator(getAllowedUpdates()), updatesConsumer);
             }
 
-            // 🔧 Удаляем @Override, потому что это не абстрактный метод
             public BotSession registerBot(String token,
                                           Supplier<TelegramUrl> telegramUrlSupplier,
                                           Function<Integer, GetUpdates> getUpdatesGenerator,
