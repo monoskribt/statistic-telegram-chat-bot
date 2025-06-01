@@ -1,20 +1,17 @@
 package com.statistictgchatbot.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.statistictgchatbot.model.Chat;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.io.IOException;
 
 public interface ChatService {
+    void saveChat(Chat chatToSave);
 
-    Chat parseChatFromFile(String filePath) throws IOException;
+    void deleteChat(Chat chatToDelete);
 
-    void saveChatEntity(Chat userEvent, Long chatId)
-            throws JsonProcessingException, TelegramApiException;
+    Chat getChatByChatId(String chatId);
 
-    Chat getChatByName(String chatName);
+    boolean chatIsExist(String chatId);
 
-    boolean chatIsExist(String chatName);
-
+    String createIdHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException;
 }

@@ -16,16 +16,16 @@ import static com.statistictgchatbot.constant.Constants.PATH_TO_UPLOADED_FILE;
 @Service
 public class BotServiceImpl implements BotService {
 
-    private final ChatService chatService;
+    private final ChatByDocumentService chatByDocumentService;
     private final FileService fileService;
     private final ChatActivityByDocumentService chatActivityByDocumentService;
     private final MessageSender messageSender;
 
-    public BotServiceImpl(@Lazy ChatService chatService,
+    public BotServiceImpl(@Lazy ChatByDocumentService chatByDocumentService,
                           @Lazy FileService fileService,
                           @Lazy MessageSender messageSender,
                           @Lazy ChatActivityByDocumentService chatActivityByDocumentService) {
-        this.chatService = chatService;
+        this.chatByDocumentService = chatByDocumentService;
         this.fileService = fileService;
         this.chatActivityByDocumentService = chatActivityByDocumentService;
         this.messageSender = messageSender;
@@ -37,9 +37,9 @@ public class BotServiceImpl implements BotService {
                                    Long chatId) throws TelegramApiException {
         try {
             fileService.uploadFile(fileName, fieldId);
-            Chat chat = chatService
+            Chat chat = chatByDocumentService
                     .parseChatFromFile(PATH_TO_UPLOADED_FILE + fileName);
-            chatService.saveChatEntity(chat, chatId);
+            chatByDocumentService.saveChatEntity(chat, chatId);
             fileService.deleteFileFromLocal(fileName);
         } catch (IOException | TelegramApiException e) {
             messageSender.sendMessage(chatId, "Failed while parsing file. " +
