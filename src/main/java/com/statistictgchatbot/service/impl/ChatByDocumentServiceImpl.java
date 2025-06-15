@@ -46,7 +46,7 @@ public class ChatByDocumentServiceImpl implements ChatByDocumentService {
     @Override
     public void saveChatEntity(Chat chat, Long chatId)
             throws JsonProcessingException, TelegramApiException {
-        String hashId = chatService.createIdHashIdForChat(chat, objectMapper);
+        String hashId = chatService.createHashIdForChat(chat, objectMapper);
         chat.setId(hashId);
 
         if(chatService.chatIsExist(hashId)) {

@@ -18,16 +18,16 @@ public class BotServiceImpl implements BotService {
 
     private final ChatByDocumentService chatByDocumentService;
     private final FileService fileService;
-    private final ChatActivityByDocumentService chatActivityByDocumentService;
+    private final ChatStatisticGenerator chatStatisticGenerator;
     private final MessageSender messageSender;
 
     public BotServiceImpl(@Lazy ChatByDocumentService chatByDocumentService,
                           @Lazy FileService fileService,
                           @Lazy MessageSender messageSender,
-                          @Lazy ChatActivityByDocumentService chatActivityByDocumentService) {
+                          @Lazy ChatStatisticGenerator chatStatisticGenerator) {
         this.chatByDocumentService = chatByDocumentService;
         this.fileService = fileService;
-        this.chatActivityByDocumentService = chatActivityByDocumentService;
+        this.chatStatisticGenerator = chatStatisticGenerator;
         this.messageSender = messageSender;
     }
 
@@ -51,25 +51,25 @@ public class BotServiceImpl implements BotService {
     @CheckChatExists
     @Override
     public void getUserActivity(Long chatId, String chatName, String messageText) throws TelegramApiException {
-        chatActivityByDocumentService.getUserActivity(chatId, chatName, messageText);
+        chatStatisticGenerator.getUserActivity(chatId, chatName, messageText);
     }
 
     @CheckChatExists
     @Override
     public void getInactiveUsersForAWeek(Long chatId, String chatName) throws TelegramApiException {
-        chatActivityByDocumentService.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
+        chatStatisticGenerator.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
     }
 
     @CheckChatExists
     @Override
     public void getAverageMessagePerDay(Long chatId, String chatName) throws TelegramApiException {
-        chatActivityByDocumentService.getAverageMessagesPerDayByLastMonth(chatId, chatName);
+        chatStatisticGenerator.getAverageMessagesPerDayByLastMonth(chatId, chatName);
     }
 
     @CheckChatExists
     @Override
     public void getChatReport(Long chatId, String chatName) throws TelegramApiException, IOException {
-        chatActivityByDocumentService.prepareStatisticCountOfMessageToGraph(chatId, chatName);
+        chatStatisticGenerator.prepareStatisticCountOfMessageToGraph(chatId, chatName);
     }
 
 

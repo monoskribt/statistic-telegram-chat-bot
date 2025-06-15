@@ -4,7 +4,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
 
-public interface ChatActivityByDocumentService {
+public interface ChatStatisticGenerator {
 
     void getUserActivity(Long chatId,
                          String chatName,

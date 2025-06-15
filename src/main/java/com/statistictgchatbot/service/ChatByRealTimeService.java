@@ -5,5 +5,5 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 public interface ChatByRealTimeService {
 
-    void getOrSaveChat(String chatId, Message message) throws JsonProcessingException;
+    void createOrUpdateChat(String chatId, Message message) throws JsonProcessingException;
 }
