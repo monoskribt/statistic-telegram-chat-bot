@@ -4,7 +4,7 @@ import com.statistictgchatbot.constant.BotCommands;
 import com.statistictgchatbot.dto.MessageStatsDTO;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.dto.WeeklyMessageStatsDTO;
-import com.statistictgchatbot.service.ChatActivityByDocumentService;
+import com.statistictgchatbot.service.ChatStatisticGenerator;
 import com.statistictgchatbot.service.FileService;
 import com.statistictgchatbot.service.MessageSender;
 import com.statistictgchatbot.util.GeneratorStatsPicture;
@@ -28,12 +28,12 @@ import static com.statistictgchatbot.constant.Constants.PATH_TO_PICTURE_WITH_CHA
 import static com.statistictgchatbot.util.FormattingMessage.formatReportMessage;
 
 @Service
-public class ChatActivityByDocumentServiceImpl implements ChatActivityByDocumentService {
+public class ChatStatisticGeneratorImpl implements ChatStatisticGenerator {
     private final MessageSender messageSender;
     private final MongoTemplate mongoTemplate;
     private final FileService fileService;
 
-    public ChatActivityByDocumentServiceImpl(MessageSender messageSender,
+    public ChatStatisticGeneratorImpl(MessageSender messageSender,
                                              MongoTemplate mongoTemplate,
                                              FileService fileService) {
         this.messageSender = messageSender;
@@ -155,7 +155,7 @@ public class ChatActivityByDocumentServiceImpl implements ChatActivityByDocument
         String result = averageMessages
                 .stream()
                 .map(messageStat -> messageStat.getTotalMessage() + " total message" + " \n"
-                    + messageStat.getAverageMessagesPerDay() + " average message")
+                        + messageStat.getAverageMessagesPerDay() + " average message")
                 .collect(Collectors.joining());
 
         messageSender.sendMessage(chatId, result);
@@ -205,7 +205,7 @@ public class ChatActivityByDocumentServiceImpl implements ChatActivityByDocument
     @Override
     public void prepareStatisticCountOfMessageToGraph(Long chatId, String chatName) throws TelegramApiException, IOException {
         List<WeeklyMessageStatsDTO> stats = Optional.of(prepareStatisticCountOfMessageToGraph(chatName))
-                        .orElseThrow(() -> new IllegalArgumentException("WeeklyMessageStatsDTO is empty"));
+                .orElseThrow(() -> new IllegalArgumentException("WeeklyMessageStatsDTO is empty"));
 
         GeneratorStatsPicture.buildChart(stats, PATH_TO_PICTURE_WITH_CHAT_STATS);
 

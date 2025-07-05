@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChatRepo extends MongoRepository<Chat, String> {
-    Optional<Chat> findByChatName(String chatName);
+    Optional<Chat> findChatByChatId(String chatId);
 
-    boolean existsByChatName(String chatName);
+    boolean existsChatByChatId(String chatId);
 }

@@ -1,14 +1,20 @@
 package com.statistictgchatbot.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.statistictgchatbot.constant.BotCommands;
+import com.statistictgchatbot.converter.MessageConverter;
 import com.statistictgchatbot.exception.FileDownloadException;
+import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.service.BotService;
+import com.statistictgchatbot.service.ChatByRealTimeService;
+import com.statistictgchatbot.service.ChatService;
 import com.statistictgchatbot.service.UpdateReceivedService;
 import com.statistictgchatbot.util.CommandUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Document;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
@@ -17,15 +23,21 @@ import java.io.IOException;
 public class UpdateReceivedServiceImpl implements UpdateReceivedService {
 
     private final BotService botService;
+    private final ChatByRealTimeService chatByRealTimeService;
+    private final ChatService chatService;
 
     private final static Logger log = LoggerFactory.getLogger(UpdateReceivedServiceImpl.class);
 
-    public UpdateReceivedServiceImpl(BotService botService) {
+    public UpdateReceivedServiceImpl(BotService botService,
+                                     ChatByRealTimeService chatByRealTimeService,
+                                     ChatService chatService) {
         this.botService = botService;
+        this.chatByRealTimeService = chatByRealTimeService;
+        this.chatService = chatService;
     }
 
     @Override
-    public void updateReceivedMessage(String messageText, Long chatId) {
+    public void updateReceivedMessageByCommand(String messageText, Long chatId) {
         String[] splitMessage = messageText.split("\\s+");
         String chatName = splitMessage[splitMessage.length - 1];
 
@@ -47,6 +59,11 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
         } catch (TelegramApiException | IOException e) {
             log.warn("Problem with chat name or method");
         }
+    }
+
+    @Override
+    public void updateReceivedMessage(String chatId, Message message) throws JsonProcessingException {
+        chatByRealTimeService.createOrUpdateChat(chatId, message);
     }
 
     @Override

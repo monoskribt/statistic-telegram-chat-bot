@@ -7,13 +7,11 @@ import com.statistictgchatbot.constant.message_entity_constant.Action;
 import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.util.TextDeserialize;
-import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
 public class Message {
 
     @JsonProperty(value = "id")
@@ -58,4 +56,116 @@ public class Message {
 
     @JsonProperty(value = "reactions")
     private List<Reaction> reactions;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public TypeOfEvent getType() {
+        return type;
+    }
+
+    public void setType(TypeOfEvent type) {
+        this.type = type;
+    }
+
+    public Date getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
+    }
+
+    public Date getEditedAt() {
+        return editedAt;
+    }
+
+    public void setEditedAt(Date editedAt) {
+        this.editedAt = editedAt;
+    }
+
+    public String getActor() {
+        return actor;
+    }
+
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
+
+    public String getActorId() {
+        return actorId;
+    }
+
+    public void setActorId(String actorId) {
+        this.actorId = actorId;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public List<String> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<String> members) {
+        this.members = members;
+    }
+
+    public String getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(String fromUser) {
+        this.fromUser = fromUser;
+    }
+
+    public String getFromId() {
+        return fromId;
+    }
+
+    public void setFromId(String fromId) {
+        this.fromId = fromId;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public List<Reaction> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
+    }
 }
