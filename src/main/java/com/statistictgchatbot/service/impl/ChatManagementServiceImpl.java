@@ -2,36 +2,48 @@ package com.statistictgchatbot.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
+import com.statistictgchatbot.converter.ChatConverter;
+import com.statistictgchatbot.converter.MessageConverter;
 import com.statistictgchatbot.exception.ChatNotFoundException;
 import com.statistictgchatbot.exception.ParseFileException;
 import com.statistictgchatbot.model.Chat;
+import com.statistictgchatbot.service.ChatManagementService;
 import com.statistictgchatbot.service.ChatService;
 import com.statistictgchatbot.service.MessageSender;
-import com.statistictgchatbot.service.ChatByDocumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
 import java.io.IOException;
 
 import static com.statistictgchatbot.constant.MessageToUser.*;
+import static com.statistictgchatbot.constant.MessageToUser.SUCCESSFULLY_SAVED;
 
 @Service
-public class ChatByDocumentServiceImpl implements ChatByDocumentService {
+public class ChatManagementServiceImpl implements ChatManagementService {
 
     private final ChatService chatService;
     private final MessageSender messageSender;
+    private final MessageConverter messageConverter;
+    private final ChatConverter chatConverter;
 
-    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
-
-    public ChatByDocumentServiceImpl(ChatService chatService, MessageSender messageSender) {
+    public ChatManagementServiceImpl(ChatService chatService,
+                                     MessageSender messageSender,
+                                     MessageConverter messageConverter,
+                                     ChatConverter chatConverter) {
         this.chatService = chatService;
         this.messageSender = messageSender;
+        this.messageConverter = messageConverter;
+        this.chatConverter = chatConverter;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     @Override
     public Chat parseChatFromFile(String filePath) {
@@ -44,7 +56,7 @@ public class ChatByDocumentServiceImpl implements ChatByDocumentService {
     }
 
     @Override
-    public void saveChatEntity(Chat chat, Long chatId)
+    public void saveChatFromFile(Chat chat, Long chatId)
             throws JsonProcessingException, TelegramApiException {
         String hashId = chatService.createHashIdForChat(chat, objectMapper);
         chat.setId(hashId);
@@ -80,6 +92,20 @@ public class ChatByDocumentServiceImpl implements ChatByDocumentService {
             chatService.saveChat(chat);
             messageSender.sendMessage(chatId, SUCCESSFULLY_SAVED);
             log.info("Chat history saved");
+        }
+    }
+
+    @Override
+    public void createOrUpdateChatFromMessage(String chatId, Message message) throws JsonProcessingException {
+        com.statistictgchatbot.model.submodel.Message messageToDb =
+                messageConverter.convertMessageTGEntityToDBEntity(message, TypeOfEvent.MESSAGE);
+
+        if(chatService.chatIsExist(chatId)) {
+            chatService.appendMessage(chatId, messageToDb);
+        }
+        else {
+            Chat chat = chatConverter.createChat(message, messageToDb);
+            chatService.saveChat(chat);
         }
     }
 }

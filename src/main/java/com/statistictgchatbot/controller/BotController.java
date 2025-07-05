@@ -1,7 +1,6 @@
 package com.statistictgchatbot.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.statistictgchatbot.service.ChatByRealTimeService;
+import com.statistictgchatbot.service.ChatManagementService;
 import com.statistictgchatbot.service.UpdateReceivedService;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -17,11 +16,11 @@ import java.util.List;
 @Component
 public class BotController implements LongPollingUpdateConsumer {
     private final UpdateReceivedService updateReceivedService;
-    private final ChatByRealTimeService chatByRealTimeService;
+    private final ChatManagementService chatManagementService;
 
-    public BotController(UpdateReceivedService updateReceivedService, ChatByRealTimeService chatByRealTimeService) {
+    public BotController(UpdateReceivedService updateReceivedService, ChatManagementService chatManagementService) {
         this.updateReceivedService = updateReceivedService;
-        this.chatByRealTimeService = chatByRealTimeService;
+        this.chatManagementService = chatManagementService;
     }
 
     @SneakyThrows

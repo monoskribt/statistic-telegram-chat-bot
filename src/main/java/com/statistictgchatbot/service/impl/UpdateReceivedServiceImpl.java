@@ -2,13 +2,8 @@ package com.statistictgchatbot.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.statistictgchatbot.constant.BotCommands;
-import com.statistictgchatbot.converter.MessageConverter;
 import com.statistictgchatbot.exception.FileDownloadException;
-import com.statistictgchatbot.model.Chat;
-import com.statistictgchatbot.service.BotService;
-import com.statistictgchatbot.service.ChatByRealTimeService;
-import com.statistictgchatbot.service.ChatService;
-import com.statistictgchatbot.service.UpdateReceivedService;
+import com.statistictgchatbot.service.*;
 import com.statistictgchatbot.util.CommandUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,16 +18,16 @@ import java.io.IOException;
 public class UpdateReceivedServiceImpl implements UpdateReceivedService {
 
     private final BotService botService;
-    private final ChatByRealTimeService chatByRealTimeService;
+    private final ChatManagementService chatManagementService;
     private final ChatService chatService;
 
     private final static Logger log = LoggerFactory.getLogger(UpdateReceivedServiceImpl.class);
 
     public UpdateReceivedServiceImpl(BotService botService,
-                                     ChatByRealTimeService chatByRealTimeService,
+                                     ChatManagementService chatManagementService,
                                      ChatService chatService) {
         this.botService = botService;
-        this.chatByRealTimeService = chatByRealTimeService;
+        this.chatManagementService = chatManagementService;
         this.chatService = chatService;
     }
 
@@ -63,7 +58,7 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
 
     @Override
     public void updateReceivedMessage(String chatId, Message message) throws JsonProcessingException {
-        chatByRealTimeService.createOrUpdateChat(chatId, message);
+        chatManagementService.createOrUpdateChatFromMessage(chatId, message);
     }
 
     @Override
