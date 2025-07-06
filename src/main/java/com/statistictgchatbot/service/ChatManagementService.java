@@ -11,5 +11,6 @@ public interface ChatManagementService {
 
     void saveChatFromFile(Chat chat, Long chatId) throws JsonProcessingException, TelegramApiException;
 
-    void createOrUpdateChatFromMessage(String chatId, Message message) throws JsonProcessingException;
+    void saveChatFromMessage(Message message,
+                             com.statistictgchatbot.model.submodel.Message messageToDb) throws JsonProcessingException;
 }

@@ -2,6 +2,9 @@ package com.statistictgchatbot.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.statistictgchatbot.constant.BotCommands;
+import com.statistictgchatbot.constant.message_entity_constant.MediaType;
+import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
+import com.statistictgchatbot.converter.MessageConverter;
 import com.statistictgchatbot.exception.FileDownloadException;
 import com.statistictgchatbot.service.*;
 import com.statistictgchatbot.util.CommandUtils;
@@ -13,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class UpdateReceivedServiceImpl implements UpdateReceivedService {
@@ -20,15 +24,18 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
     private final BotService botService;
     private final ChatManagementService chatManagementService;
     private final ChatService chatService;
+    private final MessageConverter messageConverter;
 
     private final static Logger log = LoggerFactory.getLogger(UpdateReceivedServiceImpl.class);
 
     public UpdateReceivedServiceImpl(BotService botService,
                                      ChatManagementService chatManagementService,
-                                     ChatService chatService) {
+                                     ChatService chatService,
+                                     MessageConverter messageConverter) {
         this.botService = botService;
         this.chatManagementService = chatManagementService;
         this.chatService = chatService;
+        this.messageConverter = messageConverter;
     }
 
     @Override
@@ -57,8 +64,25 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
     }
 
     @Override
-    public void updateReceivedMessage(String chatId, Message message) throws JsonProcessingException {
-        chatManagementService.createOrUpdateChatFromMessage(chatId, message);
+    public void updateReceivedMessage(String chatId, Message message, TypeOfEvent typeOfEvent, MediaType mediaType) {
+        com.statistictgchatbot.model.submodel.Message messageToDb =
+                messageConverter.convertMessageTGEntityToDBEntityForMessagesEvents(
+                        message,
+                        typeOfEvent,
+                        mediaType);
+
+        Optional.of(chatId)
+                .filter(chatService::chatIsExist)
+                .ifPresentOrElse(
+                        id -> chatService.appendMessage(id, messageToDb),
+                        () -> {
+                            try {
+                                chatManagementService.saveChatFromMessage(message, messageToDb);
+                            } catch (JsonProcessingException e) {
+                                log.info("Failed during serialization message from TG");
+                            }
+                        }
+                );
     }
 
     @Override

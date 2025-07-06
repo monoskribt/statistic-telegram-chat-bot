@@ -1,10 +1,15 @@
 package com.statistictgchatbot.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.statistictgchatbot.constant.message_entity_constant.MediaType;
+import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
+import com.statistictgchatbot.exception.ParseMessageException;
 import com.statistictgchatbot.service.ChatManagementService;
 import com.statistictgchatbot.service.UpdateReceivedService;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
+import org.telegram.telegrambots.meta.api.objects.Audio;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
@@ -36,9 +41,7 @@ public class BotController implements LongPollingUpdateConsumer {
                     updateReceivedService.updateReceivedMessageByCommand(messageText, chatId);
                 }
 
-                if(message.hasText()) {
-                    updateReceivedService.updateReceivedMessage(String.valueOf(chatId), message);
-                }
+                extracted(message, chatId);
 
                 if (update.getMessage().hasDocument()) {
                     Chat tgChat = update.getMessage().getChat();
@@ -49,6 +52,44 @@ public class BotController implements LongPollingUpdateConsumer {
                     }
                 }
             }
+        }
+    }
+
+    private void extracted(Message message, Long chatId) {
+        if(message.hasText()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.TEXT);
+        }
+
+        if(message.hasAudio()) {
+            Audio audio = message.getAudio();
+        }
+
+        if(message.hasVoice()) {
+
+        }
+
+        if(message.hasVideo()) {
+
+        }
+
+        if(message.hasPhoto()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.PHOTO);
+        }
+
+        if(message.hasAnimation()) {
+
+        }
+
+        if(message.hasSticker()) {
+
         }
     }
 }

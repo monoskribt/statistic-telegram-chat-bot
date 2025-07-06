@@ -3,9 +3,12 @@ package com.statistictgchatbot.constant.message_entity_constant;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum MediaType {
-    VIDEO_FILE,
+    TEXT,
+    PHOTO,
+    AUDIO,
     VOICE_MESSAGE,
     VIDEO_MESSAGE,
+    VIDEO_FILE,
     STICKER,
     ANIMATION;
 

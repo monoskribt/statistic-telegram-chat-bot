@@ -24,7 +24,7 @@ public class Message {
     private Date createAt;
 
     @JsonProperty(value = "edited")
-    private Date editedAt;
+    private Integer editedAt;
 
     @JsonProperty(value = "actor")
     private String actor;
@@ -81,11 +81,11 @@ public class Message {
         this.createAt = createAt;
     }
 
-    public Date getEditedAt() {
+    public Integer getEditedAt() {
         return editedAt;
     }
 
-    public void setEditedAt(Date editedAt) {
+    public void setEditedAt(Integer editedAt) {
         this.editedAt = editedAt;
     }
 

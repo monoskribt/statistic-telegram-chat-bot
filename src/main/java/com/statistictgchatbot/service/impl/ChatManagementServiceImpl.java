@@ -28,16 +28,11 @@ public class ChatManagementServiceImpl implements ChatManagementService {
 
     private final ChatService chatService;
     private final MessageSender messageSender;
-    private final MessageConverter messageConverter;
     private final ChatConverter chatConverter;
 
-    public ChatManagementServiceImpl(ChatService chatService,
-                                     MessageSender messageSender,
-                                     MessageConverter messageConverter,
-                                     ChatConverter chatConverter) {
+    public ChatManagementServiceImpl(ChatService chatService, MessageSender messageSender, ChatConverter chatConverter) {
         this.chatService = chatService;
         this.messageSender = messageSender;
-        this.messageConverter = messageConverter;
         this.chatConverter = chatConverter;
     }
 
@@ -96,16 +91,9 @@ public class ChatManagementServiceImpl implements ChatManagementService {
     }
 
     @Override
-    public void createOrUpdateChatFromMessage(String chatId, Message message) throws JsonProcessingException {
-        com.statistictgchatbot.model.submodel.Message messageToDb =
-                messageConverter.convertMessageTGEntityToDBEntity(message, TypeOfEvent.MESSAGE);
-
-        if(chatService.chatIsExist(chatId)) {
-            chatService.appendMessage(chatId, messageToDb);
-        }
-        else {
-            Chat chat = chatConverter.createChat(message, messageToDb);
-            chatService.saveChat(chat);
-        }
+    public void saveChatFromMessage(Message message,
+                                    com.statistictgchatbot.model.submodel.Message messageToDb) throws JsonProcessingException {
+        Chat chat = chatConverter.createChat(message, messageToDb);
+        chatService.saveChat(chat);
     }
 }
