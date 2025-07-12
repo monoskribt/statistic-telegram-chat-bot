@@ -70,7 +70,6 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
                         message,
                         typeOfEvent,
                         mediaType);
-
         Optional.of(chatId)
                 .filter(chatService::chatIsExist)
                 .ifPresentOrElse(

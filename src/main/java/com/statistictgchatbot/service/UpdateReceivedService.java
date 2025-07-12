@@ -1,6 +1,5 @@
 package com.statistictgchatbot.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import org.telegram.telegrambots.meta.api.objects.Document;

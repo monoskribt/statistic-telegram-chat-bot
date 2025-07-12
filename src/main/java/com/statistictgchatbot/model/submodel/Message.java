@@ -6,14 +6,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.statistictgchatbot.constant.message_entity_constant.Action;
 import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
+import com.statistictgchatbot.model.submodel.message_model.*;
 import com.statistictgchatbot.util.TextDeserialize;
+import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Message {
-
     @JsonProperty(value = "id")
     private int id;
 
@@ -45,7 +46,25 @@ public class Message {
     private String fromId;
 
     @JsonProperty(value = "photo")
-    private String photo;
+    private Photo photo;
+
+    @JsonProperty(value = "audio")
+    private Audio audio;
+
+    @JsonProperty(value = "voice")
+    private Voice voice;
+
+    @JsonProperty(value = "video")
+    private Video video;
+
+    @JsonProperty(value = "videoNote")
+    private VideoNote videoNote;
+
+    @JsonProperty(value = "animation")
+    private Animation animation;
+
+    @JsonProperty(value = "sticker")
+    private Sticker sticker;
 
     @JsonProperty(value = "media_type")
     private MediaType mediaType;
@@ -53,6 +72,9 @@ public class Message {
     @JsonProperty(value = "text")
     @JsonDeserialize(using = TextDeserialize.class)
     private String text;
+
+    @JsonProperty(value = "caption")
+    private String caption;
 
     @JsonProperty(value = "reactions")
     private List<Reaction> reactions;
@@ -137,12 +159,54 @@ public class Message {
         this.fromId = fromId;
     }
 
-    public String getPhoto() {
-        return photo;
+
+
+    public Audio getAudio() {
+        return audio;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
+    public void setAudio(Audio audio) {
+        this.audio = audio;
+    }
+
+    public Voice getVoice() {
+        return voice;
+    }
+
+    public void setVoice(Voice voice) {
+        this.voice = voice;
+    }
+
+    public Video getVideo() {
+        return video;
+    }
+
+    public void setVideo(Video video) {
+        this.video = video;
+    }
+
+    public VideoNote getVideoNote() {
+        return videoNote;
+    }
+
+    public void setVideoNote(VideoNote videoNote) {
+        this.videoNote = videoNote;
+    }
+
+    public Animation getAnimation() {
+        return animation;
+    }
+
+    public void setAnimation(Animation animation) {
+        this.animation = animation;
+    }
+
+    public Sticker getSticker() {
+        return sticker;
+    }
+
+    public void setSticker(Sticker sticker) {
+        this.sticker = sticker;
     }
 
     public MediaType getMediaType() {
@@ -167,5 +231,21 @@ public class Message {
 
     public void setReactions(List<Reaction> reactions) {
         this.reactions = reactions;
+    }
+
+    public Photo getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
+    }
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
     }
 }

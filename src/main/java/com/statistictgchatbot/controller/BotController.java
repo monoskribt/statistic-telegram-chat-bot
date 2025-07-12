@@ -1,15 +1,11 @@
 package com.statistictgchatbot.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
-import com.statistictgchatbot.exception.ParseMessageException;
-import com.statistictgchatbot.service.ChatManagementService;
 import com.statistictgchatbot.service.UpdateReceivedService;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
-import org.telegram.telegrambots.meta.api.objects.Audio;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.chat.Chat;
@@ -21,11 +17,9 @@ import java.util.List;
 @Component
 public class BotController implements LongPollingUpdateConsumer {
     private final UpdateReceivedService updateReceivedService;
-    private final ChatManagementService chatManagementService;
 
-    public BotController(UpdateReceivedService updateReceivedService, ChatManagementService chatManagementService) {
+    public BotController(UpdateReceivedService updateReceivedService) {
         this.updateReceivedService = updateReceivedService;
-        this.chatManagementService = chatManagementService;
     }
 
     @SneakyThrows
@@ -65,15 +59,35 @@ public class BotController implements LongPollingUpdateConsumer {
         }
 
         if(message.hasAudio()) {
-            Audio audio = message.getAudio();
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.AUDIO);
         }
 
         if(message.hasVoice()) {
-
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.VOICE_MESSAGE);
         }
 
         if(message.hasVideo()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.VIDEO_FILE);
+        }
 
+        if(message.hasVideoNote()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.VIDEO_MESSAGE);
         }
 
         if(message.hasPhoto()) {
@@ -85,11 +99,19 @@ public class BotController implements LongPollingUpdateConsumer {
         }
 
         if(message.hasAnimation()) {
-
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.ANIMATION);
         }
 
         if(message.hasSticker()) {
-
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.STICKER);
         }
     }
 }
