@@ -1,5 +1,10 @@
 package com.statistictgchatbot.model.submodel.message_model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Animation extends AbstractMediaType {
     protected String mimeType;
 
@@ -8,11 +13,4 @@ public class Animation extends AbstractMediaType {
         this.mimeType = mimeType;
     }
 
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
 }

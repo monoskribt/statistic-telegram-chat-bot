@@ -1,5 +1,10 @@
 package com.statistictgchatbot.model.submodel.message_model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Audio extends AbstractMediaType {
     private Integer duration;
     private String fileName;
@@ -12,27 +17,4 @@ public class Audio extends AbstractMediaType {
         this.title = title;
     }
 
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }

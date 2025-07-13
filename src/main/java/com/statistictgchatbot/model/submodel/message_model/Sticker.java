@@ -1,5 +1,10 @@
 package com.statistictgchatbot.model.submodel.message_model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Sticker extends AbstractMediaType {
     protected String customEmojiId;
     protected String emoji;
@@ -12,27 +17,4 @@ public class Sticker extends AbstractMediaType {
         this.type = type;
     }
 
-    public String getCustomEmojiId() {
-        return customEmojiId;
-    }
-
-    public void setCustomEmojiId(String customEmojiId) {
-        this.customEmojiId = customEmojiId;
-    }
-
-    public String getEmoji() {
-        return emoji;
-    }
-
-    public void setEmoji(String emoji) {
-        this.emoji = emoji;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 }

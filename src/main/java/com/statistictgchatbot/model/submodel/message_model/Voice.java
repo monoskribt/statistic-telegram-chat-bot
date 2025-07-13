@@ -1,5 +1,10 @@
 package com.statistictgchatbot.model.submodel.message_model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Voice extends AbstractMediaType {
     protected Integer duration;
 
@@ -8,11 +13,4 @@ public class Voice extends AbstractMediaType {
         this.duration = duration;
     }
 
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
 }

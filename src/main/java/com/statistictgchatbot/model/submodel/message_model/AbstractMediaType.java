@@ -1,5 +1,10 @@
 package com.statistictgchatbot.model.submodel.message_model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public abstract class AbstractMediaType {
     protected String fileId;
     protected String fileUniqueId;
@@ -11,27 +16,4 @@ public abstract class AbstractMediaType {
         this.fileSize = fileSize;
     }
 
-    public String getFileId() {
-        return fileId;
-    }
-
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
-    }
-
-    public String getFileUniqueId() {
-        return fileUniqueId;
-    }
-
-    public void setFileUniqueId(String fileUniqueId) {
-        this.fileUniqueId = fileUniqueId;
-    }
-
-    public Integer getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(Integer fileSize) {
-        this.fileSize = fileSize;
-    }
 }

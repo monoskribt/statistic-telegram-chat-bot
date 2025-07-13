@@ -2,9 +2,7 @@ package com.statistictgchatbot.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.converter.ChatConverter;
-import com.statistictgchatbot.converter.MessageConverter;
 import com.statistictgchatbot.exception.ChatNotFoundException;
 import com.statistictgchatbot.exception.ParseFileException;
 import com.statistictgchatbot.model.Chat;

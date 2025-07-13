@@ -1,80 +1,110 @@
 package com.statistictgchatbot.service.impl;
 
-import com.statistictgchatbot.annotation.CheckChatExists;
-import com.statistictgchatbot.constant.MessageToUser;
-import com.statistictgchatbot.exception.FileDownloadException;
-import com.statistictgchatbot.model.Chat;
+import com.statistictgchatbot.constant.message_entity_constant.MediaType;
+import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.service.*;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.io.IOException;
-
-import static com.statistictgchatbot.constant.Constants.PATH_TO_UPLOADED_FILE;
+import org.telegram.telegrambots.meta.api.objects.Document;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 @Service
+@RequiredArgsConstructor
 public class BotServiceImpl implements BotService {
-
-    private final ChatManagementService chatManagementService;
-    private final FileService fileService;
-    private final ChatStatisticGenerator chatStatisticGenerator;
-    private final MessageSender messageSender;
-
-    public BotServiceImpl(@Lazy ChatManagementService chatManagementService,
-                          @Lazy FileService fileService,
-                          @Lazy MessageSender messageSender,
-                          @Lazy ChatStatisticGenerator chatStatisticGenerator) {
-        this.chatManagementService = chatManagementService;
-        this.fileService = fileService;
-        this.chatStatisticGenerator = chatStatisticGenerator;
-        this.messageSender = messageSender;
-    }
+    private final UpdateReceivedService updateReceivedService;
 
     @Override
-    public void documentProcessing(String fileName,
-                                   String fieldId,
-                                   Long chatId) throws TelegramApiException {
-        try {
-            fileService.uploadFile(fileName, fieldId);
-            Chat chat = chatManagementService
-                    .parseChatFromFile(PATH_TO_UPLOADED_FILE + fileName);
-            chatManagementService.saveChatFromFile(chat, chatId);
-            fileService.deleteFileFromLocal(fileName);
-        } catch (IOException | TelegramApiException e) {
-            messageSender.sendMessage(chatId, "Failed while parsing file. " +
-                    "Check your file and try again later");
-            throw new FileDownloadException("Failed to download file");
+    public void handleBotEvents(Update update) {
+        Long chatId = update.getMessage().getChatId();
+        Message message = update.getMessage();
+
+        handleCommand(update, message, chatId);
+        handleMessage(message, chatId);
+        handleDocument(update, chatId);
+    }
+
+    private void handleCommand(Update update, Message message, Long chatId) {
+        if (message.hasText() && message.getText().startsWith("/")) {
+            String messageText = update.getMessage().getText();
+            updateReceivedService.updateReceivedMessageByCommand(messageText, chatId);
         }
     }
 
-    @CheckChatExists
-    @Override
-    public void getUserActivity(Long chatId, String chatName, String messageText) throws TelegramApiException {
-        chatStatisticGenerator.getUserActivity(chatId, chatName, messageText);
+    private void handleMessage(Message message, Long chatId) {
+        if(message.hasText()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.TEXT);
+        }
+
+        if(message.hasAudio()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.AUDIO);
+        }
+
+        if(message.hasVoice()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.VOICE_MESSAGE);
+        }
+
+        if(message.hasVideo()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.VIDEO_FILE);
+        }
+
+        if(message.hasVideoNote()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.VIDEO_MESSAGE);
+        }
+
+        if(message.hasPhoto()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.PHOTO);
+        }
+
+        if(message.hasAnimation()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.ANIMATION);
+        }
+
+        if(message.hasSticker()) {
+            updateReceivedService.updateReceivedMessage(
+                    String.valueOf(chatId),
+                    message,
+                    TypeOfEvent.MESSAGE,
+                    MediaType.STICKER);
+        }
     }
 
-    @CheckChatExists
-    @Override
-    public void getInactiveUsersForAWeek(Long chatId, String chatName) throws TelegramApiException {
-        chatStatisticGenerator.getUsersWithoutActivityMoreThanWeek(chatId, chatName);
-    }
+    private void handleDocument(Update update, Long chatId) {
+        if (update.getMessage().hasDocument()) {
+            org.telegram.telegrambots.meta.api.objects.chat.Chat tgChat = update.getMessage().getChat();
 
-    @CheckChatExists
-    @Override
-    public void getAverageMessagePerDay(Long chatId, String chatName) throws TelegramApiException {
-        chatStatisticGenerator.getAverageMessagesPerDayByLastMonth(chatId, chatName);
-    }
-
-    @CheckChatExists
-    @Override
-    public void getChatReport(Long chatId, String chatName) throws TelegramApiException, IOException {
-        chatStatisticGenerator.prepareStatisticCountOfMessageToGraph(chatId, chatName);
-    }
-
-
-    @Override
-    public void sendDefaultMessage(Long chatId) throws TelegramApiException {
-        messageSender.sendMessage(chatId, MessageToUser.UNKNOWN_COMMAND);
+            if (tgChat.isUserChat()) {
+                Document document = update.getMessage().getDocument();
+                updateReceivedService.updateReceivedDocument(document, chatId);
+            }
+        }
     }
 }

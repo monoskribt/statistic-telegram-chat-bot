@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VoiceConverter implements MediaConverter<org.telegram.telegrambots.meta.api.objects.Voice, Voice> {
+
     @Override
     public com.statistictgchatbot.model.submodel.message_model.Voice convert(org.telegram.telegrambots.meta.api.objects.Voice voice) {
         return new com.statistictgchatbot.model.submodel.message_model.Voice(

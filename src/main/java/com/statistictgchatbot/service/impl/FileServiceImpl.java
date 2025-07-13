@@ -2,6 +2,8 @@ package com.statistictgchatbot.service.impl;
 
 import com.statistictgchatbot.props.BotProps;
 import com.statistictgchatbot.service.FileService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -15,14 +17,11 @@ import java.util.Optional;
 import static com.statistictgchatbot.constant.Constants.PATH_TO_UPLOADED_FILE;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class FileServiceImpl implements FileService {
 
     private final BotProps botProps;
-    private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
-
-    public FileServiceImpl(BotProps botProps) {
-        this.botProps = botProps;
-    }
 
     @Override
     public void uploadFile(String fileName, String fileId) throws IOException {

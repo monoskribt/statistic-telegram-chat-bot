@@ -6,10 +6,11 @@ import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.converter.MessageConverter;
 import com.statistictgchatbot.exception.FileDownloadException;
+import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.service.*;
 import com.statistictgchatbot.util.CommandUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -18,25 +19,19 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.statistictgchatbot.constant.Constants.PATH_TO_UPLOADED_FILE;
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UpdateReceivedServiceImpl implements UpdateReceivedService {
 
-    private final BotService botService;
+    private final ChatAnalytics chatAnalytics;
     private final ChatManagementService chatManagementService;
     private final ChatService chatService;
     private final MessageConverter messageConverter;
-
-    private final static Logger log = LoggerFactory.getLogger(UpdateReceivedServiceImpl.class);
-
-    public UpdateReceivedServiceImpl(BotService botService,
-                                     ChatManagementService chatManagementService,
-                                     ChatService chatService,
-                                     MessageConverter messageConverter) {
-        this.botService = botService;
-        this.chatManagementService = chatManagementService;
-        this.chatService = chatService;
-        this.messageConverter = messageConverter;
-    }
+    private final FileService fileService;
+    private final MessageSender messageSender;
 
     @Override
     public void updateReceivedMessageByCommand(String messageText, Long chatId) {
@@ -48,15 +43,15 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
         try {
             switch (command) {
                 case BotCommands.MOST_ACTIVE_USERS, BotCommands.MOST_INACTIVE_USERS ->
-                        botService.getUserActivity(chatId, chatName, messageText);
+                        chatAnalytics.getUserActivity(chatId, chatName, messageText);
                 case BotCommands.INACTIVE_BY_WEEK ->
-                        botService.getInactiveUsersForAWeek(chatId, chatName);
+                        chatAnalytics.getInactiveUsersForAWeek(chatId, chatName);
                 case BotCommands.AVERAGE_MESSAGE_PER_DAY ->
-                        botService.getAverageMessagePerDay(chatId, chatName);
+                        chatAnalytics.getAverageMessagePerDay(chatId, chatName);
                 case BotCommands.CHAT_REPORT ->
-                        botService.getChatReport(chatId, chatName);
+                        chatAnalytics.getChatReport(chatId, chatName);
                 case BotCommands.UNKNOWN_COMMAND ->
-                        botService.sendDefaultMessage(chatId);
+                        chatAnalytics.sendDefaultMessage(chatId);
             }
         } catch (TelegramApiException | IOException e) {
             log.warn("Problem with chat name or method");
@@ -73,12 +68,16 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
         Optional.of(chatId)
                 .filter(chatService::chatIsExist)
                 .ifPresentOrElse(
-                        id -> chatService.appendMessage(id, messageToDb),
+                        id -> {
+                            chatService.appendMessage(id, messageToDb);
+                            log.info("Added message: {}", messageToDb);
+                        },
                         () -> {
                             try {
                                 chatManagementService.saveChatFromMessage(message, messageToDb);
+                                log.info("Saved new chat in Data Base and added the message: {}", messageToDb);
                             } catch (JsonProcessingException e) {
-                                log.info("Failed during serialization message from TG");
+                                log.warn("Failed during serialization message from TG");
                             }
                         }
                 );
@@ -90,9 +89,23 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
         String fileName = document.getFileName();
 
         try {
-            botService.documentProcessing(fileName, fieldId, chatId);
+            documentProcessing(fileName, fieldId, chatId);
         } catch (TelegramApiException e) {
             throw new FileDownloadException("Failed during download file");
+        }
+    }
+
+    private void documentProcessing(String fileName, String fieldId, Long chatId) throws TelegramApiException {
+        try {
+            fileService.uploadFile(fileName, fieldId);
+            Chat chat = chatManagementService
+                    .parseChatFromFile(PATH_TO_UPLOADED_FILE + fileName);
+            chatManagementService.saveChatFromFile(chat, chatId);
+            fileService.deleteFileFromLocal(fileName);
+        } catch (IOException | TelegramApiException e) {
+            messageSender.sendMessage(chatId, "Failed while parsing file. " +
+                    "Check your file and try again later");
+            throw new FileDownloadException("Failed to download file");
         }
     }
 }
