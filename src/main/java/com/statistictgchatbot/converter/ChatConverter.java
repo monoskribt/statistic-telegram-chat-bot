@@ -19,7 +19,8 @@ public class ChatConverter {
         this.chatService = chatService;
     }
 
-    public Chat createChat(Message message, com.statistictgchatbot.model.submodel.Message messageToDb) throws JsonProcessingException {
+    public Chat createChat(Message message,
+                           com.statistictgchatbot.model.submodel.Message messageToDb) throws JsonProcessingException {
         Chat chat = new Chat();
         chat.setChatId(message.getChatId().toString());
         chat.setChatName(message.getChat().getTitle());
