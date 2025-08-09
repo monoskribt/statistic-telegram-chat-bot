@@ -29,6 +29,7 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
     private final ChatAnalytics chatAnalytics;
     private final ChatManagementService chatManagementService;
     private final ChatService chatService;
+    private final MessageService messageService;
     private final MessageConverter messageConverter;
     private final FileService fileService;
     private final MessageSender messageSender;
@@ -69,7 +70,7 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
                 .filter(chatService::chatIsExist)
                 .ifPresentOrElse(
                         id -> {
-                            chatService.appendMessage(id, messageToDb);
+                            messageService.appendMessage(id, messageToDb);
                             log.info("Added message: {}", messageToDb);
                         },
                         () -> {

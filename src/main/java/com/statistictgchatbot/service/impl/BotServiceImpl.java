@@ -13,6 +13,8 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 @RequiredArgsConstructor
 public class BotServiceImpl implements BotService {
     private final UpdateReceivedService updateReceivedService;
+    private final MessageService messageService;
+    private final ChatService chatService;
 
     @Override
     public void handleBotEvents(Update update) {
@@ -22,6 +24,19 @@ public class BotServiceImpl implements BotService {
         handleCommand(update, message, chatId);
         handleMessage(message, chatId);
         handleDocument(update, chatId);
+        handleEditedMessage(update);
+    }
+
+    private void handleEditedMessage(Update update) {
+        Message editedMessage = update.getEditedMessage();
+        chatService.chatIsExist(String.valueOf(editedMessage.getChatId()));
+        if(chatService.chatIsExist(String.valueOf(editedMessage.getChatId()))) {
+            com.statistictgchatbot.model.submodel.Message message = messageService
+                    .getMessageByChatAndMessageId(editedMessage.getChatId(), editedMessage.getMessageId());
+            message.setCaption(editedMessage.getCaption());
+            message.setText(editedMessage.getText());
+            message.setEditedAt(editedMessage.getEditDate());
+        }
     }
 
     private void handleCommand(Update update, Message message, Long chatId) {

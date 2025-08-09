@@ -13,7 +13,5 @@ public interface ChatService {
 
     boolean chatIsExist(String chatId);
 
-    void appendMessage(String chatId, com.statistictgchatbot.model.submodel.Message message);
-
     String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException;
 }
