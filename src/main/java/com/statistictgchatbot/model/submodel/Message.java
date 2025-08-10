@@ -9,6 +9,7 @@ import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.model.submodel.message_model.*;
 import com.statistictgchatbot.util.TextDeserialize;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 public class Message {
     @JsonProperty(value = "id")
     private int id;

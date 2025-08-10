@@ -16,13 +16,10 @@ import java.util.List;
 public class BotController implements LongPollingUpdateConsumer {
     private final BotService botService;
 
-    @SneakyThrows
     @Override
     public void consume(List<Update> list) {
         for(Update update : list) {
-            if (update.hasMessage()) {
-                botService.handleBotEvents(update);
-            }
+            botService.handleBotEvents(update);
         }
     }
 }

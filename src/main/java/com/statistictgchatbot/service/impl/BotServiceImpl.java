@@ -4,6 +4,7 @@ import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -11,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BotServiceImpl implements BotService {
     private final UpdateReceivedService updateReceivedService;
     private final MessageService messageService;
@@ -18,25 +20,39 @@ public class BotServiceImpl implements BotService {
 
     @Override
     public void handleBotEvents(Update update) {
-        Long chatId = update.getMessage().getChatId();
-        Message message = update.getMessage();
+        if (update.hasMessage()) {
+            Long chatId = update.getMessage().getChatId();
+            Message message = update.getMessage();
 
-        handleCommand(update, message, chatId);
-        handleMessage(message, chatId);
-        handleDocument(update, chatId);
-        handleEditedMessage(update);
+            handleCommand(update, message, chatId);
+            handleMessage(message, chatId);
+            handleDocument(update, chatId);
+        }
+        if(update.hasEditedMessage()) {
+            handleEditedMessage(update);
+        }
     }
 
-    private void handleEditedMessage(Update update) {
+    @Override
+    public void handleEditedMessage(Update update) {
         Message editedMessage = update.getEditedMessage();
         chatService.chatIsExist(String.valueOf(editedMessage.getChatId()));
         if(chatService.chatIsExist(String.valueOf(editedMessage.getChatId()))) {
-            com.statistictgchatbot.model.submodel.Message message = messageService
-                    .getMessageByChatAndMessageId(editedMessage.getChatId(), editedMessage.getMessageId());
-            message.setCaption(editedMessage.getCaption());
-            message.setText(editedMessage.getText());
-            message.setEditedAt(editedMessage.getEditDate());
+            try {
+                com.statistictgchatbot.model.submodel.Message message = messageService
+                        .getMessageByChatAndMessageId(editedMessage.getChatId(), editedMessage.getMessageId());
+                createEditedMessage(message, editedMessage);
+                messageService.updateMessage(String.valueOf(editedMessage.getChatId()), editedMessage.getMessageId(), message);
+            } catch (Exception e) {
+                log.warn("Exception: {}", e.getMessage());
+            }
         }
+    }
+
+    private static void createEditedMessage(com.statistictgchatbot.model.submodel.Message message, Message editedMessage) {
+        message.setCaption(editedMessage.getCaption());
+        message.setText(editedMessage.getText());
+        message.setEditedAt(editedMessage.getEditDate());
     }
 
     private void handleCommand(Update update, Message message, Long chatId) {
