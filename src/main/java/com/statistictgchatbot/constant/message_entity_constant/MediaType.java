@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum MediaType {
     TEXT,
+    REPLY,
     PHOTO,
     AUDIO,
     VOICE_MESSAGE,

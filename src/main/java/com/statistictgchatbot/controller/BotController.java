@@ -2,11 +2,10 @@ package com.statistictgchatbot.controller;
 
 import com.statistictgchatbot.service.BotService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.api.objects.reactions.MessageReactionUpdated;
 
 import java.util.List;
 

@@ -7,7 +7,6 @@ import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.repository.ChatRepo;
 import com.statistictgchatbot.service.ChatService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 

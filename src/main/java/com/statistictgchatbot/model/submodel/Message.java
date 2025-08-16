@@ -8,10 +8,7 @@ import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.model.submodel.message_model.*;
 import com.statistictgchatbot.util.TextDeserialize;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -52,6 +49,9 @@ public class Message {
     @JsonProperty(value = "from_id")
     private String fromId;
 
+    @JsonProperty(value = "reply_to_message_id")
+    private Message replyToMessage;
+
     @JsonProperty(value = "photo")
     private Photo photo;
 
@@ -84,5 +84,5 @@ public class Message {
     private String caption;
 
     @JsonProperty(value = "reactions")
-    private List<Reaction> reactions;
+    private List<?> reactions;
 }
