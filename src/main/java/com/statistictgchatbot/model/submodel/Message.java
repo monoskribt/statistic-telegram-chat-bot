@@ -52,6 +52,9 @@ public class Message {
     @JsonProperty(value = "reply_to_message_id")
     private Message replyToMessage;
 
+    @JsonProperty(value = "chat_member_event")
+    private ChatMemberEvent chatMemberEvent;
+
     @JsonProperty(value = "photo")
     private Photo photo;
 
@@ -84,5 +87,5 @@ public class Message {
     private String caption;
 
     @JsonProperty(value = "reactions")
-    private List<?> reactions;
+    private List<Reaction> reactions;
 }
