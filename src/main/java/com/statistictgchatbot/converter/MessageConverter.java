@@ -41,7 +41,6 @@ public class MessageConverter {
                 Object converted = mediaConverter.convert(telegramMedia);
                 setMediaToMessage(messageToDb, mediaType, converted);
             } catch (Exception e) {
-                e.printStackTrace();
                 System.out.println("Error during converter working " + mediaType + ": " + e.getMessage());
             }
         } else {
@@ -54,6 +53,7 @@ public class MessageConverter {
 
     private Object extractTelegramMedia(org.telegram.telegrambots.meta.api.objects.message.Message message, MediaType mediaType) {
         return switch (mediaType) {
+            case REPLY -> message.getReplyToMessage();
             case AUDIO -> message.getAudio();
             case VOICE_MESSAGE -> message.getVoice();
             case VIDEO_FILE -> message.getVideo();
@@ -71,6 +71,8 @@ public class MessageConverter {
 
     private void setMediaToMessage(Message messageToDb, MediaType mediaType, Object convertedMedia) {
         switch (mediaType) {
+            case REPLY -> messageToDb
+                    .setReplyToMessage((Message) convertedMedia);
             case AUDIO -> messageToDb
                     .setAudio((com.statistictgchatbot.model.submodel.message_model.Audio)
                             convertedMedia);

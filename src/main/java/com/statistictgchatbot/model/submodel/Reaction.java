@@ -7,8 +7,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Reaction {
 
@@ -20,4 +18,28 @@ public class Reaction {
 
     @JsonProperty(value = "recent")
     private List<ReactionDetail> reactionDetails;
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public String getEmoji() {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
+    }
+
+    public List<ReactionDetail> getReactionDetails() {
+        return reactionDetails;
+    }
+
+    public void setReactionDetails(List<ReactionDetail> reactionDetails) {
+        this.reactionDetails = reactionDetails;
+    }
 }

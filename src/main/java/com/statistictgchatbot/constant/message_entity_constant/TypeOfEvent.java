@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum TypeOfEvent {
     MESSAGE,
+    JOIN_MEMBER,
+    LEAVE_MEMBER,
     SERVICE;
 
     @JsonCreator

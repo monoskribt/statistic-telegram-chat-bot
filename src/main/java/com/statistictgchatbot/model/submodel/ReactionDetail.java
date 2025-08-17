@@ -7,8 +7,6 @@ import lombok.Setter;
 
 import java.util.Date;
 
-@Getter
-@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReactionDetail {
 
@@ -20,4 +18,28 @@ public class ReactionDetail {
 
     @JsonProperty(value = "date")
     private Date date;
+
+    public String getFromUser() {
+        return fromUser;
+    }
+
+    public void setFromUser(String fromUser) {
+        this.fromUser = fromUser;
+    }
+
+    public String getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(String fromUserId) {
+        this.fromUserId = fromUserId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 }

@@ -14,7 +14,10 @@ public class MediaConverterRegistry {
 
     public MediaConverterRegistry(List<MediaConverter<?, ?>> converters) {
         converters.forEach(converter -> {
-            if(converter instanceof PhotoConverter) {
+            if(converter instanceof ReplyConverter) {
+                mapRegistryConverters.put(MediaType.REPLY, converter);
+            }
+            else if(converter instanceof PhotoConverter) {
                 mapRegistryConverters.put(MediaType.PHOTO, converter);
             }
             else if(converter instanceof AudioConverter) {
