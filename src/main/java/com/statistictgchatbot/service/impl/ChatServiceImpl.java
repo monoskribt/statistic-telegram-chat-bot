@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
@@ -40,5 +42,10 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException {
         return DigestUtils.md5DigestAsHex(objectMapper.writeValueAsBytes(chat));
+    }
+
+    @Override
+    public List<Chat> getAllChat() {
+        return chatRepo.findAll();
     }
 }

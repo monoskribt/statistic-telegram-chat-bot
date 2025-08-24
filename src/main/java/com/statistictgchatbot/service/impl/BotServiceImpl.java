@@ -2,10 +2,12 @@ package com.statistictgchatbot.service.impl;
 
 import com.statistictgchatbot.constant.message_entity_constant.MediaType;
 import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
+import com.statistictgchatbot.creation.MessagesObjectsCreation;
 import com.statistictgchatbot.model.submodel.Reaction;
-import com.statistictgchatbot.model.submodel.ReactionDetail;
-import com.statistictgchatbot.model.submodel.message_model.ChatMemberEvent;
-import com.statistictgchatbot.service.*;
+import com.statistictgchatbot.service.BotService;
+import com.statistictgchatbot.service.ChatService;
+import com.statistictgchatbot.service.MessageService;
+import com.statistictgchatbot.service.UpdateReceivedService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,6 @@ import org.telegram.telegrambots.meta.api.objects.reactions.MessageReactionUpdat
 import org.telegram.telegrambots.meta.api.objects.reactions.ReactionType;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ public class BotServiceImpl implements BotService {
     private final UpdateReceivedService updateReceivedService;
     private final MessageService messageService;
     private final ChatService chatService;
+    private final MessagesObjectsCreation messagesObjectsCreation;
 
     @Override
     public void handleBotEvents(Update update) {
@@ -48,7 +50,8 @@ public class BotServiceImpl implements BotService {
             handleReaction(update);
         }
         if(update.hasChatMember()) {
-            handleChatMember(update);
+            Long chatId = update.getMessage().getChatId();
+            handleChatMember(update, String.valueOf(chatId));
         }
     }
 
@@ -132,18 +135,12 @@ public class BotServiceImpl implements BotService {
             try {
                 com.statistictgchatbot.model.submodel.Message message = messageService
                         .getMessageByChatAndMessageId(editedMessage.getChatId(), editedMessage.getMessageId());
-                createEditedMessage(message, editedMessage);
+                messagesObjectsCreation.createEditedMessage(message, editedMessage);
                 messageService.updateMessage(String.valueOf(editedMessage.getChatId()), editedMessage.getMessageId(), message);
             } catch (Exception e) {
                 log.warn("Exception: {}", e.getMessage());
             }
         }
-    }
-
-    private void createEditedMessage(com.statistictgchatbot.model.submodel.Message message, Message editedMessage) {
-        message.setCaption(editedMessage.getCaption());
-        message.setText(editedMessage.getText());
-        message.setEditedAt(editedMessage.getEditDate());
     }
 
     private void handleReaction(Update update) {
@@ -165,44 +162,25 @@ public class BotServiceImpl implements BotService {
             messageFromDb.setReactions(reactions);
         }
 
-        for (ReactionType rt : reactionUpdated.getNewReaction()) {
-            ReactionDetail detail = new ReactionDetail();
-            detail.setFromUserId(reactionUpdated.getUser().getId().toString());
-            detail.setDate(new Date());
-
-            Reaction reaction = new Reaction();
-            reaction.setEmoji(rt.toString());
-            reaction.setReactionDetails(List.of(detail));
-            reaction.setCount(reactions.size() + 1);
-            reactions.add(reaction);
-
+        for (ReactionType reactionType : reactionUpdated.getNewReaction()) {
+            messagesObjectsCreation.createCreationType(reactionType, reactionUpdated, reactions);
             messageFromDb.setReactions(reactions);
         }
 
         messageService.updateMessage(String.valueOf(chatId), messageId, messageFromDb);
     }
 
-    private static void handleChatMember(Update update) {
+    private void handleChatMember(Update update, String chatId) {
         ChatMemberUpdated chatMemberUpdated = update.getChatMember();
 
         com.statistictgchatbot.model.submodel.Message message = new com.statistictgchatbot.model.submodel.Message();
 
         switch (chatMemberUpdated.getNewChatMember().getStatus()) {
-            case MEMBER -> createChatMemberEvent(message, chatMemberUpdated, TypeOfEvent.JOIN_MEMBER);
-            case LEFT, KICKED -> createChatMemberEvent(message, chatMemberUpdated, TypeOfEvent.LEAVE_MEMBER);
+            case MEMBER -> messagesObjectsCreation.createChatMemberEvent(message, chatMemberUpdated, TypeOfEvent.JOIN_MEMBER);
+            case LEFT, KICKED -> messagesObjectsCreation.createChatMemberEvent(message, chatMemberUpdated, TypeOfEvent.LEAVE_MEMBER);
         }
-    }
 
-    private static void createChatMemberEvent(com.statistictgchatbot.model.submodel.Message message, ChatMemberUpdated chatMemberUpdated, TypeOfEvent joinMember) {
-        message.setId(chatMemberUpdated.getNewChatMember().getUser().hashCode());
-        message.setType(joinMember);
-
-        ChatMemberEvent chatMemberEvent = new ChatMemberEvent();
-        chatMemberEvent.setUserId(chatMemberEvent.getUserId());
-        chatMemberEvent.setUsername(chatMemberEvent.getUsername());
-        chatMemberEvent.setDate(new Date());
-
-        message.setChatMemberEvent(chatMemberEvent);
+        messageService.appendMessage(chatId, message);
     }
 
     private void handleDocument(Update update, Long chatId) {
