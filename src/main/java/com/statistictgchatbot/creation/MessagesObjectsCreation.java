@@ -5,7 +5,7 @@ import com.statistictgchatbot.model.submodel.Reaction;
 import com.statistictgchatbot.model.submodel.ReactionDetail;
 import com.statistictgchatbot.model.submodel.message_model.ChatMemberEvent;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.reactions.MessageReactionUpdated;
 import org.telegram.telegrambots.meta.api.objects.reactions.ReactionType;
@@ -17,13 +17,15 @@ import java.util.List;
 public class MessagesObjectsCreation {
 
     public void createChatMemberEvent(com.statistictgchatbot.model.submodel.Message message,
-                                      ChatMemberUpdated chatMemberUpdated, TypeOfEvent joinMember) {
-        message.setId(chatMemberUpdated.getNewChatMember().getUser().hashCode());
-        message.setType(joinMember);
+                                      Message tgMessage,
+                                      User user,
+                                      TypeOfEvent typeOfEvent) {
+        message.setId(tgMessage.getMessageId());
+        message.setType(typeOfEvent);
 
         ChatMemberEvent chatMemberEvent = new ChatMemberEvent();
-        chatMemberEvent.setUserId(chatMemberEvent.getUserId());
-        chatMemberEvent.setUsername(chatMemberEvent.getUsername());
+        chatMemberEvent.setUserId(String.valueOf(user.getId()));
+        chatMemberEvent.setUsername(user.getUserName());
         chatMemberEvent.setDate(new Date());
 
         message.setChatMemberEvent(chatMemberEvent);

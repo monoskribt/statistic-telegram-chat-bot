@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.reactions.MessageReactionUpdated;
@@ -39,6 +40,11 @@ public class BotServiceImpl implements BotService {
             Long chatId = update.getMessage().getChatId();
             Message message = update.getMessage();
 
+            if (message.getLeftChatMember() != null ||
+                    (message.getNewChatMembers() != null && !message.getNewChatMembers().isEmpty())) {
+                handleChatMember(update, String.valueOf(chatId));
+                return;
+            }
             handleCommand(update, message, chatId);
             handleMessage(message, chatId);
             handleDocument(update, chatId);
@@ -48,10 +54,6 @@ public class BotServiceImpl implements BotService {
         }
         if (update.getMessageReaction() != null) {
             handleReaction(update);
-        }
-        if(update.hasChatMember()) {
-            Long chatId = update.getMessage().getChatId();
-            handleChatMember(update, String.valueOf(chatId));
         }
     }
 
@@ -171,16 +173,27 @@ public class BotServiceImpl implements BotService {
     }
 
     private void handleChatMember(Update update, String chatId) {
-        ChatMemberUpdated chatMemberUpdated = update.getChatMember();
-
-        com.statistictgchatbot.model.submodel.Message message = new com.statistictgchatbot.model.submodel.Message();
-
-        switch (chatMemberUpdated.getNewChatMember().getStatus()) {
-            case MEMBER -> messagesObjectsCreation.createChatMemberEvent(message, chatMemberUpdated, TypeOfEvent.JOIN_MEMBER);
-            case LEFT, KICKED -> messagesObjectsCreation.createChatMemberEvent(message, chatMemberUpdated, TypeOfEvent.LEAVE_MEMBER);
+        com.statistictgchatbot.model.submodel.Message dbMessage = new com.statistictgchatbot.model.submodel.Message();
+        if (update.hasMessage()) {
+            Message tgMessage = update.getMessage();
+            if (tgMessage.getNewChatMembers() != null && !tgMessage.getNewChatMembers().isEmpty()) {
+                for (User user : tgMessage.getNewChatMembers()) {
+                    messagesObjectsCreation.createChatMemberEvent(
+                            dbMessage,
+                            tgMessage,
+                            user,
+                            TypeOfEvent.JOIN_MEMBER);
+                }
+            } else if (tgMessage.getLeftChatMember() != null) {
+                messagesObjectsCreation.createChatMemberEvent(
+                        dbMessage,
+                        tgMessage,
+                        tgMessage.getLeftChatMember(),
+                        TypeOfEvent.LEAVE_MEMBER);
+            }
         }
 
-        messageService.appendMessage(chatId, message);
+        messageService.appendMessage(chatId, dbMessage);
     }
 
     private void handleDocument(Update update, Long chatId) {
