@@ -37,7 +37,7 @@ public class MessageServiceImpl implements MessageService {
         MatchOperation matchOperationMessage = Aggregation.match(Criteria.where("messages._id").is(messageId));
 
         ProjectionOperation projectionOperation = Aggregation.project()
-                .and("messages._id").as("id")
+                .and("messages._id").as("_id")
                 .and("messages.type").as("type")
                 .and("messages.createAt").as("createAt")
                 .and("messages.editedAt").as("editedAt")
@@ -57,8 +57,7 @@ public class MessageServiceImpl implements MessageService {
                 .and("messages.mediaType").as("mediaType")
                 .and("messages.text").as("text")
                 .and("messages.caption").as("caption")
-                .and("messages.reactions").as("reactions")
-                .andExclude("_id");
+                .and("messages.reactions").as("reactions");
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperationChat,

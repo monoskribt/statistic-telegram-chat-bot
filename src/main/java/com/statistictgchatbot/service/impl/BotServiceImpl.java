@@ -169,6 +169,7 @@ public class BotServiceImpl implements BotService {
             messageFromDb.setReactions(reactions);
         }
 
+        messageFromDb.setId(messageId);
         messageService.updateMessage(String.valueOf(chatId), messageId, messageFromDb);
     }
 

@@ -7,6 +7,8 @@ import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.repository.ChatRepo;
 import com.statistictgchatbot.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRepo chatRepo;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public void saveChat(Chat chatToSave) {
@@ -45,7 +48,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<Chat> getAllChat() {
-        return chatRepo.findAll();
+    public List<Chat> getAllChats() {
+        return mongoTemplate.find(new Query(), Chat.class);
     }
 }

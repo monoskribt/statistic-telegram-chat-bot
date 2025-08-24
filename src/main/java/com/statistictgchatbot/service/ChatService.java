@@ -17,5 +17,5 @@ public interface ChatService {
 
     String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException;
 
-    List<Chat> getAllChat();
+    List<Chat> getAllChats();
 }

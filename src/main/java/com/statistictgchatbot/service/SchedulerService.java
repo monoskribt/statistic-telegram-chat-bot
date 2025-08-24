@@ -2,6 +2,7 @@ package com.statistictgchatbot.service;
 
 import com.statistictgchatbot.constant.BotCommands;
 import com.statistictgchatbot.model.Chat;
+import com.statistictgchatbot.repository.ChatRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,11 +18,12 @@ import java.util.List;
 public class SchedulerService {
 
     private final ChatService chatService;
+    private final ChatRepo chatRepo;
     private final ChatStatisticGenerator chatStatisticGenerator;
 
-    @Scheduled(cron = "0 45 15 * * *")
+    @Scheduled(cron = "0 25 18 * * *")
     public void generateMostActiveUsersByWeek() {
-        List<Chat> chats = new ArrayList<>();
+        List<Chat> chats = chatService.getAllChats();
         log.info(chats.toString());
 
         if(!chats.isEmpty()) {

@@ -25,7 +25,7 @@ public class MessagesObjectsCreation {
 
         ChatMemberEvent chatMemberEvent = new ChatMemberEvent();
         chatMemberEvent.setUserId(String.valueOf(user.getId()));
-        chatMemberEvent.setUsername(user.getUserName());
+        chatMemberEvent.setUsername(user.getFirstName());
         chatMemberEvent.setDate(new Date());
 
         message.setChatMemberEvent(chatMemberEvent);
@@ -46,6 +46,5 @@ public class MessagesObjectsCreation {
     public void createEditedMessage(com.statistictgchatbot.model.submodel.Message message, Message editedMessage) {
         message.setCaption(editedMessage.getCaption());
         message.setText(editedMessage.getText());
-        message.setEditedAt(editedMessage.getEditDate());
     }
 }
