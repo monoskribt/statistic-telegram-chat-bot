@@ -1,8 +1,10 @@
 package com.statistictgchatbot.service;
 
 import com.statistictgchatbot.constant.BotCommands;
+import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.repository.ChatRepo;
+import com.statistictgchatbot.service.impl.ChatStatisticGeneratorImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,13 +20,11 @@ import java.util.List;
 public class SchedulerService {
 
     private final ChatService chatService;
-    private final ChatRepo chatRepo;
     private final ChatStatisticGenerator chatStatisticGenerator;
 
-    @Scheduled(cron = "0 25 18 * * *")
+    @Scheduled(cron = "0 27 21 * * *")
     public void generateMostActiveUsersByWeek() {
         List<Chat> chats = chatService.getAllChats();
-        log.info(chats.toString());
 
         if(!chats.isEmpty()) {
             chats.forEach(ch -> {
@@ -32,11 +32,11 @@ public class SchedulerService {
                     chatStatisticGenerator.getUserActivity(
                             Long.valueOf(ch.getChatId()),
                             ch.getChatName(),
-                            BotCommands.MOST_ACTIVE_USERS + ch.getChatName(),
+                            BotCommands.MOST_ACTIVE_USERS,
                             true);
-                } catch (TelegramApiException exception) {
-                    log.error("Problem during generating statistic scheduler: {}. Method name: generateStatisticsForChats",
-                            exception.getMessage());
+                    log.info("Created statistic for the chat: {}", ch.getChatName());
+                } catch (Exception e) {
+                    log.error("Error during working method generateMostActiveUsersByWeek: {}", e.getMessage());
                 }
             });
         }

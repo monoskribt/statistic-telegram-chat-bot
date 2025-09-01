@@ -29,7 +29,7 @@ public class Message {
     private Date createAt;
 
     @JsonProperty(value = "edited")
-    private Integer editedAt;
+    private Date editedAt;
 
     @JsonProperty(value = "actor")
     private String actor;

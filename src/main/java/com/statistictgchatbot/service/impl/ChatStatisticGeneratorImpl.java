@@ -43,11 +43,13 @@ public class ChatStatisticGeneratorImpl implements ChatStatisticGenerator {
 
     @Override
     public void getUserActivity(Long chatId, String chatName, String activityStatus, boolean filterByLastWeek) throws TelegramApiException {
-        List<UserMessageStatsDTO> stats = activeStatusUsers(chatName, activityStatus, false).stream()
+        List<UserMessageStatsDTO> stats = activeStatusUsers(chatName, activityStatus, filterByLastWeek).stream()
                 .filter(stat -> stat.getUsername() != null)
                 .toList();
-        String result = formatMostActiveUsersMessage(stats);
-        messageSender.sendMessage(chatId, result);
+        if(!stats.isEmpty()) {
+            String result = formatMostActiveUsersMessage(stats);
+            messageSender.sendMessage(chatId, result);
+        }
     }
 
     public List<UserMessageStatsDTO> activeStatusUsers(String chatName,
