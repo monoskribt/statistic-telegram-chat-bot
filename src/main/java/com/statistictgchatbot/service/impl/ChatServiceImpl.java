@@ -7,14 +7,21 @@ import com.statistictgchatbot.model.Chat;
 import com.statistictgchatbot.repository.ChatRepo;
 import com.statistictgchatbot.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRepo chatRepo;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public void saveChat(Chat chatToSave) {
@@ -38,7 +45,17 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public boolean chatIsExistByChatName(String chatName) {
+        return chatRepo.existsChatByChatName(chatName);
+    }
+
+    @Override
     public String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException {
         return DigestUtils.md5DigestAsHex(objectMapper.writeValueAsBytes(chat));
+    }
+
+    @Override
+    public List<Chat> getAllChats() {
+        return mongoTemplate.find(new Query(), Chat.class);
     }
 }

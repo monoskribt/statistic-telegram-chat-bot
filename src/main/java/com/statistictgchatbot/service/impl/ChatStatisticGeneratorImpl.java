@@ -18,13 +18,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.statistictgchatbot.constant.Constants.PATH_TO_PICTURE_WITH_CHAT_STATS;
+import static com.statistictgchatbot.util.FormattingMessage.formatMostActiveUsersMessage;
 import static com.statistictgchatbot.util.FormattingMessage.formatReportMessage;
 
 @Service
@@ -43,23 +42,33 @@ public class ChatStatisticGeneratorImpl implements ChatStatisticGenerator {
 
 
     @Override
-    public void getUserActivity(Long chatId, String chatName, String activeStatus) throws TelegramApiException {
-        List<UserMessageStatsDTO> stats = activeStatusUsers(chatName, activeStatus);
-
-        String result = stats.stream()
+    public void getUserActivity(Long chatId, String chatName, String activityStatus, boolean filterByLastWeek) throws TelegramApiException {
+        List<UserMessageStatsDTO> stats = activeStatusUsers(chatName, activityStatus, filterByLastWeek).stream()
                 .filter(stat -> stat.getUsername() != null)
-                .map(stat -> stat.getUsername() + " -- " + stat.getMessageCount() + " messages")
-                .collect(Collectors.joining("\n"));
-
-        messageSender.sendMessage(chatId, result);
+                .toList();
+        if(!stats.isEmpty()) {
+            String result = formatMostActiveUsersMessage(stats);
+            messageSender.sendMessage(chatId, result);
+        }
     }
 
-    private List<UserMessageStatsDTO> activeStatusUsers(String chatName, String activeStatus) {
+    public List<UserMessageStatsDTO> activeStatusUsers(String chatName,
+                                                        String activeStatus,
+                                                        boolean filterByLastWeek) {
         boolean isActive = activeStatus.startsWith(BotCommands.MOST_ACTIVE_USERS);
         boolean isInactive = activeStatus.startsWith(BotCommands.MOST_INACTIVE_USERS);
 
         if(!isActive && !isInactive) {
             throw new NoSuchElementException("Message is not found");
+        }
+
+        MatchOperation filterByDate = null;
+        if(filterByLastWeek) {
+            Date sevenDaysAgo = Date.from(LocalDate.now()
+                    .minusDays(7)
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant());
+            filterByDate = Aggregation.match(Criteria.where("messages.createAt").gte(sevenDaysAgo));
         }
 
         MatchOperation matchOperation = Aggregation
@@ -84,14 +93,20 @@ public class ChatStatisticGeneratorImpl implements ChatStatisticGenerator {
                         .then("Anonymous")).as("username")
                 .andInclude("messageCount");
 
-        Aggregation aggregation = Aggregation.newAggregation(
-                matchOperation,
-                unwindMessages,
-                groupByUser,
-                sortByCount,
-                limit,
-                project
-        );
+        List<AggregationOperation> aggregationList = new ArrayList<>();
+        aggregationList.add(matchOperation);
+        aggregationList.add(unwindMessages);
+
+        if(filterByDate != null) {
+            aggregationList.add(filterByDate);
+        }
+
+        aggregationList.add(groupByUser);
+        aggregationList.add(sortByCount);
+        aggregationList.add(limit);
+        aggregationList.add(project);
+
+        Aggregation aggregation = Aggregation.newAggregation(aggregationList);
 
         return mongoTemplate.aggregate(
                 aggregation,

@@ -1,10 +1,12 @@
 package com.statistictgchatbot.model.submodel.message_model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class Photo extends AbstractMediaType {
     protected String filePath;
 
@@ -12,5 +14,4 @@ public class Photo extends AbstractMediaType {
         super(fileId, fileUniqueId, fileSize);
         this.filePath = filePath;
     }
-
 }

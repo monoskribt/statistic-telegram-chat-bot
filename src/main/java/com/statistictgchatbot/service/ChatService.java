@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.statistictgchatbot.model.Chat;
 
+import java.util.List;
+
 public interface ChatService {
     void saveChat(Chat chatToSave);
 
@@ -13,5 +15,9 @@ public interface ChatService {
 
     boolean chatIsExist(String chatId);
 
+    boolean chatIsExistByChatName(String chatName);
+
     String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException;
+
+    List<Chat> getAllChats();
 }

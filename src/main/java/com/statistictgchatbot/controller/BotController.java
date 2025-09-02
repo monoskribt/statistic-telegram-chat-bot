@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.reactions.MessageReactionUpdated;
 
 import java.util.List;
 
@@ -17,8 +16,9 @@ public class BotController implements LongPollingUpdateConsumer {
 
     @Override
     public void consume(List<Update> list) {
-        for(Update update : list) {
+        for (Update update : list) {
             botService.handleBotEvents(update);
         }
     }
+
 }

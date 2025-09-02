@@ -24,7 +24,7 @@ public class ChatAnalyticsService implements ChatAnalytics {
     @CheckChatExists
     @Override
     public void getUserActivity(Long chatId, String chatName, String messageText) throws TelegramApiException {
-        chatStatisticGenerator.getUserActivity(chatId, chatName, messageText);
+        chatStatisticGenerator.getUserActivity(chatId, chatName, messageText, false);
     }
 
     @CheckChatExists
@@ -44,7 +44,6 @@ public class ChatAnalyticsService implements ChatAnalytics {
     public void getChatReport(Long chatId, String chatName) throws TelegramApiException, IOException {
         chatStatisticGenerator.prepareStatisticCountOfMessageToGraph(chatId, chatName);
     }
-
 
     @Override
     public void sendDefaultMessage(Long chatId) throws TelegramApiException {

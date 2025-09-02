@@ -8,7 +8,8 @@ public interface ChatStatisticGenerator {
 
     void getUserActivity(Long chatId,
                          String chatName,
-                         String messageText) throws TelegramApiException;
+                         String messageText,
+                         boolean filterByLastWeek) throws TelegramApiException;
 
     void getUsersWithoutActivityMoreThanWeek(
             Long chatId,
