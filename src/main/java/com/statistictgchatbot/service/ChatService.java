@@ -15,6 +15,8 @@ public interface ChatService {
 
     boolean chatIsExist(String chatId);
 
+    boolean chatIsExistByChatName(String chatName);
+
     String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException;
 
     List<Chat> getAllChats();

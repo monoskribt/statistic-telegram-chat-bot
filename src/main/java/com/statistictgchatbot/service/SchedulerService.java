@@ -1,17 +1,12 @@
 package com.statistictgchatbot.service;
 
 import com.statistictgchatbot.constant.BotCommands;
-import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.model.Chat;
-import com.statistictgchatbot.repository.ChatRepo;
-import com.statistictgchatbot.service.impl.ChatStatisticGeneratorImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

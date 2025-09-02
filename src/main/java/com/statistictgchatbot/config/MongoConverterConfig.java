@@ -1,4 +1,4 @@
-package com.statistictgchatbot.deserializer;
+package com.statistictgchatbot.config;
 
 import com.statistictgchatbot.deserializer.entity.*;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;

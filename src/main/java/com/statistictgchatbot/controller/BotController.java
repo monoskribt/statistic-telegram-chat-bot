@@ -17,12 +17,6 @@ public class BotController implements LongPollingUpdateConsumer {
     @Override
     public void consume(List<Update> list) {
         for (Update update : list) {
-            System.out.println("RAW UPDATE: " + update.toString());
-
-            if (update.getMessageReaction() != null) {
-                System.out.println("REACTION UPDATE CATCHED: " + update.getMessageReaction());
-            }
-
             botService.handleBotEvents(update);
         }
     }

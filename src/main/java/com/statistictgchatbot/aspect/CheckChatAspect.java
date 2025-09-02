@@ -21,13 +21,14 @@ public class CheckChatAspect {
         this.messageSender = messageSender;
     }
 
-    @Around(value = "@annotation(com.statistictgchatbot.annotation.CheckChatExists) && args(chatId,..)",
-            argNames = "joinPoint,chatId")
-    public Object checkChatExists(ProceedingJoinPoint joinPoint, Long chatId) throws Throwable {
-        if(chatService.chatIsExist(String.valueOf(chatId))) {
+    @Around(
+            value = "@annotation(com.statistictgchatbot.annotation.CheckChatExists) && args(chatId, chatName, ..)",
+            argNames = "joinPoint,chatId,chatName"
+    )
+    public Object checkChatExists(ProceedingJoinPoint joinPoint, Long chatId, String chatName) throws Throwable {
+        if (chatService.chatIsExistByChatName(chatName)) {
             return joinPoint.proceed();
-        }
-        else {
+        } else {
             messageSender.sendMessage(chatId, CHAT_DOES_NOT_FOUND);
             return null;
         }

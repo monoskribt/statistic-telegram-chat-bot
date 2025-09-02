@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMemberUpdated;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.reactions.MessageReactionUpdated;
 import org.telegram.telegrambots.meta.api.objects.reactions.ReactionType;
@@ -22,8 +21,6 @@ import org.telegram.telegrambots.meta.api.objects.reactions.ReactionType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.telegram.telegrambots.meta.api.objects.chatmember.MemberStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -132,7 +129,6 @@ public class BotServiceImpl implements BotService {
 
     public void handleEditedMessage(Update update) {
         Message editedMessage = update.getEditedMessage();
-        chatService.chatIsExist(String.valueOf(editedMessage.getChatId()));
         if(chatService.chatIsExist(String.valueOf(editedMessage.getChatId()))) {
             try {
                 com.statistictgchatbot.model.submodel.Message message = messageService
@@ -140,7 +136,7 @@ public class BotServiceImpl implements BotService {
                 messagesObjectsCreation.createEditedMessage(message, editedMessage);
                 messageService.updateMessage(String.valueOf(editedMessage.getChatId()), editedMessage.getMessageId(), message);
             } catch (Exception e) {
-                log.warn("Exception: {}", e.getMessage());
+                log.error("Exception: {}", e.getMessage());
             }
         }
     }

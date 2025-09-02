@@ -45,6 +45,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public boolean chatIsExistByChatName(String chatName) {
+        return chatRepo.existsChatByChatName(chatName);
+    }
+
+    @Override
     public String createHashIdForChat(Chat chat, ObjectMapper objectMapper) throws JsonProcessingException {
         return DigestUtils.md5DigestAsHex(objectMapper.writeValueAsBytes(chat));
     }

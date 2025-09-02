@@ -61,6 +61,10 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
 
     @Override
     public void updateReceivedMessage(String chatId, Message message, TypeOfEvent typeOfEvent, MediaType mediaType) {
+        if(message.getChat().isUserChat()) {
+            return;
+        }
+
         com.statistictgchatbot.model.submodel.Message messageToDb =
                 messageConverter.convertMessageTGEntityToDBEntityForMessagesEvents(
                         message,
@@ -78,7 +82,7 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
                                 chatManagementService.saveChatFromMessage(message, messageToDb);
                                 log.info("Saved new chat in Data Base and added the message: {}", messageToDb);
                             } catch (JsonProcessingException e) {
-                                log.warn("Failed during serialization message from TG");
+                                log.error("Failed during serialization message from TG");
                             }
                         }
                 );
