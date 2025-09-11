@@ -1,6 +1,7 @@
 package com.statistictgchatbot.service.impl;
 
 import com.statistictgchatbot.constant.BotCommands;
+import com.statistictgchatbot.constant.message_entity_constant.Action;
 import com.statistictgchatbot.dto.MessageStatsDTO;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.dto.WeeklyMessageStatsDTO;
@@ -8,6 +9,7 @@ import com.statistictgchatbot.service.ChatStatisticGenerator;
 import com.statistictgchatbot.service.FileService;
 import com.statistictgchatbot.service.MessageSender;
 import com.statistictgchatbot.util.GeneratorStatsPicture;
+import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -285,5 +287,51 @@ public class ChatStatisticGeneratorImpl implements ChatStatisticGenerator {
                 "chat",
                 WeeklyMessageStatsDTO.class
         ).getMappedResults();
+    }
+
+    public Map<String, Integer> getJoinedAndLeftUsersCount(String chatName) {
+        MatchOperation matchChatName = Aggregation.match(Criteria.where("chatName").is(chatName));
+        UnwindOperation unwindMessages = Aggregation.unwind("messages");
+
+        MatchOperation matchMessagesAction = Aggregation.match(Criteria.where("messages.action").in(
+                Action.ADD_MEMBERS.name(),
+                Action.INVITE_MEMBERS.name(),
+                Action.JOIN_BY_REQUEST.name(),
+                Action.REMOVE_MEMBERS.name()
+        ));
+
+        GroupOperation groupByAction = Aggregation.group("messages.action").count().as("count");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchChatName,
+                unwindMessages,
+                matchMessagesAction,
+                groupByAction
+        );
+
+        AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "yourCollectionName", Document.class);
+
+        return calculateJoinedAndLeftUsersHelper(results);
+    }
+
+    private Map<String, Integer> calculateJoinedAndLeftUsersHelper(AggregationResults<Document> statistic) {
+        int joined = 0;
+        int left = 0;
+
+        for(Document doc : statistic.getMappedResults()) {
+            String action = doc.getString("_id");
+            int count = doc.getInteger("count");
+
+            if (Set.of("ADD_MEMBERS", "INVITE_MEMBERS", "JOIN_BY_REQUEST").contains(action)) {
+                joined += count;
+            } else if ("REMOVE_MEMBERS".equals(action)) {
+                left += count;
+            }
+        }
+
+        return Map.of(
+                "MoveUserToChat", joined,
+                "LeaveUserFromChat", left
+        );
     }
 }

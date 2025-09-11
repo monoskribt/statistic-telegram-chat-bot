@@ -17,7 +17,7 @@ public class SchedulerService {
     private final ChatService chatService;
     private final ChatStatisticGenerator chatStatisticGenerator;
 
-    @Scheduled(cron = "0 27 21 * * *")
+    @Scheduled(cron = "0 07 20 * * *")
     public void generateMostActiveUsersByWeek() {
         List<Chat> chats = chatService.getAllChats();
 
