@@ -105,11 +105,8 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
         try {
             fileService.uploadFile(fileName, fieldId);
             s3Service.uploadFileToS3(fileName, PATH_TO_UPLOADED_FILE);
-            Chat chat = chatManagementService
-                    .parseChatFromFile(PATH_TO_UPLOADED_FILE + fileName);
-            chatManagementService.saveChatFromFile(chat, chatId);
             fileService.deleteFileFromLocal(fileName);
-        } catch (IOException | TelegramApiException e) {
+        } catch (IOException e) {
             messageSender.sendMessage(chatId, "Failed while parsing file. " +
                     "Check your file and try again later");
             throw new FileDownloadException("Failed to download file");
