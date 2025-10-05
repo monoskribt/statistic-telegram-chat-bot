@@ -1,9 +1,11 @@
 package com.statistictgchatbot.util;
 
+import com.statistictgchatbot.constant.message_entity_constant.TypeOfEvent;
 import com.statistictgchatbot.dto.UserMessageStatsDTO;
 import com.statistictgchatbot.dto.WeeklyMessageStatsDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public class FormattingMessage {
 
@@ -38,6 +40,32 @@ public class FormattingMessage {
                 default -> "⭐";
             };
             sb.append("%s %s - %d messages \n".formatted(medal, stat.getUsername(), stat.getMessageCount()));
+        }
+
+        return sb.toString();
+    }
+
+    public static String formatMostActiveUsersMessageWithUsersFlow(
+            List<UserMessageStatsDTO> userStatistic,
+            Map<TypeOfEvent, Integer> joinedLeftStatistic) {
+        StringBuilder sb = new StringBuilder(formatMostActiveUsersMessage(userStatistic));
+
+        sb.append("\n📊 User flow statistics:\n\n");
+
+        int joined = joinedLeftStatistic.getOrDefault(TypeOfEvent.JOIN_MEMBER, 0);
+        int left = joinedLeftStatistic.getOrDefault(TypeOfEvent.LEAVE_MEMBER, 0);
+        int net = joined - left;
+
+        sb.append(String.format("👥 Users joined: %d\n", joined));
+        sb.append(String.format("🚪 Users left: %d\n", left));
+        sb.append(String.format("📈 Net change: %s%d\n\n", net >= 0 ? "+" : "", net));
+
+        if (net > 0) {
+            sb.append("✅ More users joined than left - great engagement this week!\n");
+        } else if (net < 0) {
+            sb.append("⚠️ More users left than joined - consider checking in with the community.\n");
+        } else {
+            sb.append("➖ No net change in users - stable week.\n");
         }
 
         return sb.toString();

@@ -32,6 +32,7 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
     private final MessageService messageService;
     private final MessageConverter messageConverter;
     private final FileService fileService;
+    private final S3Service s3Service;
     private final MessageSender messageSender;
 
     @Override
@@ -103,6 +104,7 @@ public class UpdateReceivedServiceImpl implements UpdateReceivedService {
     private void documentProcessing(String fileName, String fieldId, Long chatId) throws TelegramApiException {
         try {
             fileService.uploadFile(fileName, fieldId);
+            s3Service.uploadFileToS3(fileName, PATH_TO_UPLOADED_FILE);
             Chat chat = chatManagementService
                     .parseChatFromFile(PATH_TO_UPLOADED_FILE + fileName);
             chatManagementService.saveChatFromFile(chat, chatId);

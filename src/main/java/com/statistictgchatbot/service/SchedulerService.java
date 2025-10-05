@@ -15,16 +15,16 @@ import java.util.List;
 public class SchedulerService {
 
     private final ChatService chatService;
-    private final ChatStatisticGenerator chatStatisticGenerator;
+    private final ChatStatisticGeneratorScheduler chatStatisticGeneratorScheduler;
 
-    @Scheduled(cron = "0 27 21 * * *")
+    @Scheduled(cron = "0 41 21 * * *")
     public void generateMostActiveUsersByWeek() {
         List<Chat> chats = chatService.getAllChats();
 
         if(!chats.isEmpty()) {
             chats.forEach(ch -> {
                 try {
-                    chatStatisticGenerator.getUserActivity(
+                    chatStatisticGeneratorScheduler.generateChatActivityStatistic(
                             Long.valueOf(ch.getChatId()),
                             ch.getChatName(),
                             BotCommands.MOST_ACTIVE_USERS,

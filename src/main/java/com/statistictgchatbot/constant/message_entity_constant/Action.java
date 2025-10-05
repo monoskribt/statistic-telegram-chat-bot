@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum Action {
     MIGRATE_FROM_GROUP,
+    MIGRATE_TO_SUPERGROUP,
+    CREATE_GROUP,
     ADD_MEMBERS,
     REMOVE_MEMBERS,
     INVITE_MEMBERS,
